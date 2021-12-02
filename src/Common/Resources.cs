@@ -4,9 +4,15 @@ namespace Common;
 
 public class Resources
 {
+    public static string[] GetResourceFileLines(string resourceFileName)
+        => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName)
+            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
     public static string GetResourceFile(string resourceFileName)
+        => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName);
+
+    private static string GetResourceFile(Assembly assembly, string resourceFileName)
     {
-        var assembly = Assembly.GetCallingAssembly();
         Stream? stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.{resourceFileName}");
 
         if (stream == null)

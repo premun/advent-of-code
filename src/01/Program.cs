@@ -1,6 +1,6 @@
 ﻿using Common;
 
-var lines = Resources.GetResourceFile("input.txt").Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+var lines = Resources.GetResourceFileLines("input.txt");
 
 var lastDepth = int.MaxValue;
 var increases = 0;
