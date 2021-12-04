@@ -11,7 +11,19 @@ public class Resources
     public static string GetResourceFile(string resourceFileName)
         => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName);
 
+    public static StreamReader GetResourceStream(string resourceFileName)
+        => new(GetResourceStream(Assembly.GetCallingAssembly(), resourceFileName));
+
     private static string GetResourceFile(Assembly assembly, string resourceFileName)
+    {
+        using (var stream = GetResourceStream(assembly, resourceFileName))
+        using (var sr = new StreamReader(stream ?? throw new FileNotFoundException($"Couldn't locate resource file '{resourceFileName}'")))
+        {
+            return sr.ReadToEnd();
+        }
+    }
+
+    private static Stream GetResourceStream(Assembly assembly, string resourceFileName)
     {
         Stream? stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.{resourceFileName}");
 
@@ -24,10 +36,11 @@ public class Resources
             }
         }
 
-        using (stream)
-        using (var sr = new StreamReader(stream ?? throw new FileNotFoundException($"Couldn't locate resource file '{resourceFileName}'")))
+        if (stream == null)
         {
-            return sr.ReadToEnd();
+            throw new Exception($"Resource {resourceFileName} not found in {assembly.GetName().Name}");
         }
+
+        return stream;
     }
 }
