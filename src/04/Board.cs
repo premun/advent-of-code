@@ -4,7 +4,7 @@ class Board
 {
     private const int Size = 5;
     private readonly int[,] _numbers;
-    private readonly bool[,] _crossed;
+    private bool[,] _crossed;
 
     public Board(int[,] numbers)
     {
@@ -33,6 +33,11 @@ class Board
 
     private bool IsRowWinning(int row)
         => !Enumerable.Range(0, Size).Any(column => !_crossed[row, column]);
+
+    public void Reset()
+    {
+        _crossed = new bool[Size, Size];
+    }
 
     private bool IsColumnWinning(int column)
         => !Enumerable.Range(0, Size).Any(row => !_crossed[row, column]);
