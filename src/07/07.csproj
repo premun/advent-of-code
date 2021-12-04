@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <RootNamespace>_03</RootNamespace>
+    <RootNamespace>_07</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
