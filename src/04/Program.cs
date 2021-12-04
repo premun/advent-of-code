@@ -15,20 +15,59 @@ while (!inputReader.EndOfStream)
     inputReader.ReadLine();
 }
 
-int Part1()
+static int GetFirstWinningBoardScore(IEnumerable<int> drawnNumbers, IEnumerable<Board> boards)
 {
     foreach (var number in drawnNumbers)
     {
-        foreach (var board in boards)
+        var winningBoard = boards.FirstOrDefault(board => board.CrossNumber(number));
+        if (winningBoard != null)
         {
-            if (board.CrossNumber(number))
-            {
-                return number * board.GetSumOfRemainingNumbers();
-            }
+            return number * winningBoard.GetSumOfRemainingNumbers();
         }
     }
 
     throw new Exception("No winning board");
 }
 
-Console.WriteLine($"Part 1: {Part1()}");
+static int GetLastWinningBoardScore(IEnumerable<int> drawnNumbers, IEnumerable<Board> boards)
+{
+    var currentRound = new Queue<Board>(boards);
+    var nextRound = new Queue<Board>();
+    Board? lastWinningBoard = null;
+
+    foreach (var number in drawnNumbers)
+    {
+        while (currentRound.Any())
+        {
+            var board = currentRound.Dequeue();
+
+            if (!board.CrossNumber(number))
+            {
+                nextRound.Enqueue(board);
+            }
+            else
+            {
+                lastWinningBoard = board;
+            }
+        }
+
+        if (!nextRound.Any())
+        {
+            return number * (lastWinningBoard ?? throw new Exception("No winning board")).GetSumOfRemainingNumbers();
+        }
+
+        currentRound = nextRound;
+        nextRound = new();
+    }
+
+    throw new Exception("Multiple winning boards");
+}
+
+Console.WriteLine($"Part 1: {GetFirstWinningBoardScore(drawnNumbers, boards)}");
+
+foreach (var board in boards)
+{
+    board.Reset();
+}
+
+Console.WriteLine($"Part 2: {GetLastWinningBoardScore(drawnNumbers, boards)}");
