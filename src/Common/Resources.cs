@@ -2,7 +2,7 @@
 
 namespace Common;
 
-public class Resources
+public static class Resources
 {
     public static string[] GetResourceFileLines(string resourceFileName)
         => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName)
@@ -43,4 +43,9 @@ public class Resources
 
         return stream;
     }
+
+    public static int[] SplitToNumbers(this string csv) => csv
+        .Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Select(int.Parse)
+        .ToArray();
 }
