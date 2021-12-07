@@ -1,10 +1,6 @@
 ﻿using Common;
 
-var population = Resources.GetResourceFileLines("input.txt")
-    .First()
-    .Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-    .Select(int.Parse)
-    .ToArray();
+var population = Resources.GetResourceFileLines("input.txt").First().SplitToNumbers();
 
 static long[] CreateHistogram(IEnumerable<int> population)
 {

@@ -3,7 +3,7 @@ using Common;
 
 using var inputReader = Resources.GetResourceStream("input.txt");
 
-var drawnNumbers = inputReader.ReadLine()!.Split(",").Select(int.Parse);
+var drawnNumbers = inputReader.ReadLine()!.SplitToNumbers();
 
 inputReader.ReadLine();
 
