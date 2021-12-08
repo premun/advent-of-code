@@ -9,10 +9,10 @@ static int Part1(IEnumerable<string> lines)
 
     foreach (var line in lines)
     {
-        var parts = line.Split("|").Select(x => x.Trim()).ToArray();
+        var parts = line.SplitBy("|").ToArray();
 
         onesFoursSevensEights += parts[1]
-            .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .SplitBy(" ")
             .Count(p => p.Length == 2 || p.Length == 3 || p.Length == 4 || p.Length == 7);
     }
 
@@ -26,15 +26,11 @@ static long Part2(IEnumerable<string> lines)
     long result = 0;
     foreach (var line in lines)
     {
+        var digits = line.SplitBy("|").Select(x => x.SplitBy(" ")).ToArray();
+
         var segmentMapper = new SegmentMapper();
-
-        var digits = line.Split("|")
-            .Select(x => x.Trim())
-            .Select(x => x.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
-            .ToArray();
-
         segmentMapper.ResolveDigits(digits[0]);
-        result += segmentMapper.MapDigit(digits[1]);
+        result += segmentMapper.MapDigits(digits[1]);
     }
 
     return result;

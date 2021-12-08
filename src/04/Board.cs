@@ -1,4 +1,6 @@
-﻿namespace _04;
+﻿using Common;
+
+namespace _04;
 
 class Board
 {
@@ -51,9 +53,8 @@ class Board
 
         for (int row = 0; row < Size; row++)
         {
-            var rowNumbers = stream
-                .ReadLine()!
-                .Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            var rowNumbers = stream.ReadLine()!
+                .SplitBy(" ")
                 .Select(int.Parse)
                 .ToArray();
 
