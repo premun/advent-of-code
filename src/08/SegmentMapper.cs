@@ -112,7 +112,7 @@ class SegmentMapper
         return null;
     }
 
-    public int MapDigit(string[] digits)
+    public int MapDigits(string[] digits)
     {
         var result = 0;
 

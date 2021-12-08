@@ -5,8 +5,7 @@ namespace Common;
 public static class Resources
 {
     public static string[] GetResourceFileLines(string resourceFileName)
-        => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName)
-            .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName).SplitBy(Environment.NewLine);
 
     public static string GetResourceFile(string resourceFileName)
         => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName);
@@ -43,9 +42,11 @@ public static class Resources
 
         return stream;
     }
-
     public static int[] SplitToNumbers(this string csv) => csv
-        .Split(",", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .SplitBy(",")
         .Select(int.Parse)
         .ToArray();
+
+    public static string[] SplitBy(this string s, string separator)
+        => s.Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 }

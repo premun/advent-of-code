@@ -3,7 +3,7 @@
 var coordinates = Resources.GetResourceFileLines("input.txt")
     .Select(line =>
     {
-        var coor = line.Split(" -> ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        var coor = line.SplitBy(" -> ")
             .SelectMany(c => c.Split(','))
             .Select(int.Parse)
             .ToArray();
