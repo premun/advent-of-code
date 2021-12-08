@@ -33,15 +33,8 @@ static long Part2(IEnumerable<string> lines)
             .Select(x => x.Split(" ", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
             .ToArray();
 
-        foreach (var digit in digits[0])
-        {
-            segmentMapper.TeachDigit(digit);
-        }
-
-        foreach (var digit in digits[1])
-        {
-            result += segmentMapper.MapDigit(digits[1]);
-        }
+        segmentMapper.ResolveDigits(digits[0]);
+        result += segmentMapper.MapDigit(digits[1]);
     }
 
     return result;
