@@ -22,6 +22,8 @@
 
 class SegmentMapper
 {
+    private record Mapping(char From, char To);
+
     private static readonly char[] s_segments = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
 
     private static readonly Dictionary<int, string> s_digits = new()
@@ -38,105 +40,128 @@ class SegmentMapper
         { 9, "abcdfg" },
     };
 
-    private readonly Dictionary<char, HashSet<char>> _possibleMappings;
+    private readonly Dictionary<char, char> _segmentMapping = new();
 
-    public SegmentMapper()
+    public void ResolveDigits(string[] signals)
     {
-        _possibleMappings = new();
+        var orderedSignals = signals
+            .OrderBy(digit => digit.Length == 2 || digit.Length == 3 || digit.Length == 4 || digit.Length == 7 ? -1 : 1)
+            .ToDictionary(d => d, d => FindMappings(d).ToHashSet());
 
-        foreach (var segment in s_segments)
+        var disallowedMappings = FindMapping(orderedSignals, new HashSet<Mapping>());
+
+        if (disallowedMappings == null)
         {
-            _possibleMappings.Add(segment, new HashSet<char>(s_segments));
+            throw new Exception($"Unclear mappings for {string.Join(", ", signals)}");
+        }
+
+        foreach (var c in s_segments)
+        {
+            _segmentMapping[c] = s_segments.First(d => !disallowedMappings.Contains(new Mapping(c, d)));
         }
     }
 
-    public void TeachDigit(string digit)
+    private HashSet<Mapping>? FindMapping(
+        IEnumerable<KeyValuePair<string, HashSet<string>>> signals,
+        HashSet<Mapping> mappings)
     {
-        switch (digit.Length)
+        if (!signals.Any())
         {
-            // This is 1
-            case 2:
-                RestrictMappings(digit, s_digits[1]);
-                return;
+            if (mappings.Count == (s_segments.Length - 1) * s_segments.Length)
+            {
+                // We found a 1:1 mapping for every segment
+                return mappings;
+            }
 
-            // This is 7
-            case 3:
-                RestrictMappings(digit, s_digits[7]);
-                return;
-
-            // This is 4
-            case 4:
-                RestrictMappings(digit, s_digits[4]);
-                return;
-
-            // Can be 2, 3, 5
-            case 5:
-                RestrictMapping(digit, new[] { s_digits[2], s_digits[3], s_digits[5] });
-                return;
-
-            // Can be 0, 6, 9
-            case 6:
-                RestrictMapping(digit, new[] { s_digits[0], s_digits[6], s_digits[9] });
-                return;
-
-            // This is 8 - no info
-            case 7:
-                return;
+            return null;
         }
 
-        throw new ArgumentException($"Invalid digit '{digit}'");
+        var pair = signals.First();
+        var signal = pair.Key;
+        var possibleDigits = pair.Value;
+
+        foreach (var possibleDigit in possibleDigits)
+        {
+            var mappedSegments = GetDistinctChars(possibleDigit);
+            var unmappedSegments = s_segments.Except(mappedSegments);
+            var newMappings = new HashSet<Mapping>(mappings);
+
+            foreach (var segment in signal)
+            {
+                foreach (var unmappedSegment in unmappedSegments)
+                {
+                    newMappings.Add(new Mapping(segment, unmappedSegment));
+                }
+            }
+
+            foreach (var unmappedSignal in s_segments.Except(signal))
+            {
+                foreach (var mappedSegment in mappedSegments)
+                {
+                    newMappings.Add(new Mapping(unmappedSignal, mappedSegment));
+                }
+            }
+
+            var result = FindMapping(signals.Skip(1), newMappings);
+            if (result is not null)
+            {
+                return result;
+            }
+        }
+
+        return null;
     }
 
     public int MapDigit(string[] digits)
     {
-        if (_possibleMappings.Values.Any(m => m.Count != 1))
+        var result = 0;
+
+        foreach (var digit in digits)
         {
-            throw new InvalidOperationException("Mapping is unclear!");
+            // Map to our digit
+            var mappedDigit = new string(digit.Select(x => _segmentMapping[x]).OrderBy(x => x).ToArray());
+
+            var value = s_digits.First(x => x.Value == mappedDigit).Key;
+
+            result *= 10;
+            result += value;
         }
 
-        return 0;
+        return result;
     }
 
-    private void AddMapping(char from, char to) => _possibleMappings[from].Add(to);
-
-    private void RemoveMapping(char from, char to) => _possibleMappings[from].Remove(to);
-
-    private void RestrictMappings(string from, string to)
+    private static IEnumerable<string> FindMappings(string signal)
     {
-        RemoveAllMappings(from);
-
-        foreach (var f in from)
+        switch (signal.Length)
         {
-            foreach (var t in to)
-            {
-                AddMapping(f, t);
-            }
+            // This is 1
+            case 2:
+                return new[] { s_digits[1] };
+
+            // This is 7
+            case 3:
+                return new[] { s_digits[7] };
+
+            // This is 4
+            case 4:
+                return new[] { s_digits[4] };
+
+            // Can be 2, 3, 5
+            case 5:
+                return new[] { s_digits[2], s_digits[3], s_digits[5] };
+
+            // Can be 0, 6, 9
+            case 6:
+                return new[] { s_digits[0], s_digits[6], s_digits[9] };
+
+            // This is 8
+            case 7:
+                return new[] { s_digits[8] };
         }
+
+        throw new ArgumentException($"Invalid signal: '{signal}'");
     }
 
-    private void RestrictMapping(string from, string[] to)
-    {
-        var chars = to.SelectMany(x => x).Distinct().ToArray();
-
-        foreach (var c in from)
-        {
-            _possibleMappings[c] = _possibleMappings[c].Intersect(chars).ToHashSet();
-        }
-    }
-
-    private void RemoveAllMappings(string digit)
-    {
-        foreach (var c in digit)
-        {
-            RemoveAllMappings(c);
-        }
-    }
-
-    private void RemoveAllMappings(char to)
-    {
-        foreach (var segment in s_segments)
-        {
-            RemoveMapping(segment, to);
-        }
-    }
+    private static IEnumerable<char> GetDistinctChars(params string[] strings)
+        => strings.SelectMany(x => x).Distinct().ToArray();
 }
