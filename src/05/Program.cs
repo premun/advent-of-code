@@ -11,35 +11,15 @@ var coordinates = Resources.GetResourceFileLines("input.txt")
         return (Start: (X: coor[0], Y: coor[1]), End: (X: coor[2], Y: coor[3]));
     });
 
-static void DisplayMap(int[,] map)
-{
-    for (int row = 0; row < map.GetLength(0); row++)
-    {
-        for (int column = 0; column < map.GetLength(1); column++)
-        {
-            Console.Write(map[column, row] switch
-            {
-                0 => ".",
-                _ => map[column, row].ToString(),
-            });
-        }
-        Console.WriteLine();
-    }
-
-    Console.WriteLine();
-}
-
 static int CountOverlaps(IEnumerable<((int X, int Y) Start, (int X, int Y) End)> coordinates, bool skipDiagonal = true)
 {
     var xCoordinates = coordinates.SelectMany(c => new[] { c.Start.X, c.End.X });
     var yCoordinates = coordinates.SelectMany(c => new[] { c.Start.Y, c.End.Y });
 
-    var minX = xCoordinates.Min();
-    var maxX = xCoordinates.Max();
-    var minY = yCoordinates.Min();
-    var maxY = yCoordinates.Max();
+    var min = (X: xCoordinates.Min(), Y: yCoordinates.Min());
+    var max = (X: xCoordinates.Max(), Y: yCoordinates.Max());
 
-    var map = new int[maxX - minX + 1, maxY - minY + 1];
+    var map = new int[max.X - min.X + 1, max.Y - min.Y + 1];
     var overlapCount = 0;
 
     foreach (var coor in coordinates)
@@ -69,8 +49,8 @@ static int CountOverlaps(IEnumerable<((int X, int Y) Start, (int X, int Y) End)>
             current.X += step.X;
             current.Y += step.Y;
 
-            var x = current.X - minX;
-            var y = current.Y - minY;
+            var x = current.X - min.X;
+            var y = current.Y - min.Y;
 
             map[x, y] += 1;
 
