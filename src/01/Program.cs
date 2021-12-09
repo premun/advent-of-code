@@ -1,35 +1,13 @@
 ﻿using Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var depths = Resources.GetResourceFileLines("input.txt").Select(int.Parse).ToArray();
 
-var lastDepth = int.MaxValue;
-var increases = 0;
-
-// Part 1
-foreach (var depth in lines.Select(int.Parse))
+static int GetIncreaseCount(int[] depths, int lookback)
 {
-    if (depth > lastDepth)
-    {
-        increases++;
-    }
-
-    lastDepth = depth;
+    return depths
+        .Select((d, index) => (d, index < lookback ? int.MaxValue : depths[index - lookback]))
+        .Count(pair => pair.Item1 > pair.Item2);
 }
 
-Console.WriteLine($"Part 1: {increases}");
-
-// Part 2
-increases = 0;
-lastDepth = int.MaxValue;
-
-var allDepths = lines.Select(int.Parse).ToArray();
-
-for (int i = 3; i < allDepths.Length; i++)
-{
-    if (allDepths[i - 3] < allDepths[i])
-    {
-        increases++;
-    }
-}
-
-Console.WriteLine($"Part 2: {increases}");
+Console.WriteLine($"Part 1: {GetIncreaseCount(depths, 1)}");
+Console.WriteLine($"Part 2: {GetIncreaseCount(depths, 3)}");
