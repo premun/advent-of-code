@@ -14,8 +14,10 @@ static long[] CreateHistogram(IEnumerable<int> population)
     return histogram;
 }
 
-static long Evolve(long[] histogram, int generations)
+static long Evolve(IEnumerable<int> population, int generations)
 {
+    long[] histogram = CreateHistogram(population);
+
     for (int i = 0; i < generations; i++)
     {
         var readyToBreed = histogram[0];
@@ -31,5 +33,5 @@ static long Evolve(long[] histogram, int generations)
     return histogram.Sum();
 }
 
-Console.WriteLine($"Part 1: {Evolve(CreateHistogram(population), 80)}");
-Console.WriteLine($"Part 2: {Evolve(CreateHistogram(population), 256)}");
+Console.WriteLine($"Part 1: {Evolve(population, 80)}");
+Console.WriteLine($"Part 2: {Evolve(population, 256)}");
