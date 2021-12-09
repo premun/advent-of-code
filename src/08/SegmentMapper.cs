@@ -48,7 +48,7 @@ class SegmentMapper
             .OrderBy(digit => digit.Length == 2 || digit.Length == 3 || digit.Length == 4 || digit.Length == 7 ? -1 : 1)
             .ToDictionary(d => d, d => FindMappings(d).ToHashSet());
 
-        var disallowedMappings = FindMapping(orderedSignals, new HashSet<Mapping>());
+        var disallowedMappings = FindDisallowedMappings(orderedSignals, new HashSet<Mapping>());
 
         if (disallowedMappings == null)
         {
@@ -61,15 +61,16 @@ class SegmentMapper
         }
     }
 
-    private HashSet<Mapping>? FindMapping(
+    private HashSet<Mapping>? FindDisallowedMappings(
         IEnumerable<KeyValuePair<string, HashSet<string>>> signals,
         HashSet<Mapping> mappings)
     {
         if (!signals.Any())
         {
+            // We found a 1:1 mapping for every segment
             if (mappings.Count == (s_segments.Length - 1) * s_segments.Length)
+            if (s_segments.All(segment => mappings.Count(mapping => mapping.From == segment) == s_segments.Length - 1))
             {
-                // We found a 1:1 mapping for every segment
                 return mappings;
             }
 
@@ -102,7 +103,7 @@ class SegmentMapper
                 }
             }
 
-            var result = FindMapping(signals.Skip(1), newMappings);
+            var result = FindDisallowedMappings(signals.Skip(1), newMappings);
             if (result is not null)
             {
                 return result;
@@ -130,37 +131,28 @@ class SegmentMapper
         return result;
     }
 
-    private static IEnumerable<string> FindMappings(string signal)
+    private static IEnumerable<string> FindMappings(string signal) => signal.Length switch
     {
-        switch (signal.Length)
-        {
-            // This is 1
-            case 2:
-                return new[] { s_digits[1] };
+        // This is 1
+        2 => new[] { s_digits[1] },
 
-            // This is 7
-            case 3:
-                return new[] { s_digits[7] };
+        // This is 7
+        3 => new[] { s_digits[7] },
 
-            // This is 4
-            case 4:
-                return new[] { s_digits[4] };
+        // This is 4
+        4 => new[] { s_digits[4] },
 
-            // Can be 2, 3, 5
-            case 5:
-                return new[] { s_digits[2], s_digits[3], s_digits[5] };
+        // Can be 2, 3, 5
+        5 => new[] { s_digits[2], s_digits[3], s_digits[5] },
 
-            // Can be 0, 6, 9
-            case 6:
-                return new[] { s_digits[0], s_digits[6], s_digits[9] };
+        // Can be 0, 6, 9
+        6 => new[] { s_digits[0], s_digits[6], s_digits[9] },
 
-            // This is 8
-            case 7:
-                return new[] { s_digits[8] };
-        }
+        // This is 8
+        7 => new[] { s_digits[8] },
 
-        throw new ArgumentException($"Invalid signal: '{signal}'");
-    }
+        _ => throw new ArgumentException($"Invalid signal: '{signal}'"),
+    };
 
     private static IEnumerable<char> GetDistinctChars(params string[] strings)
         => strings.SelectMany(x => x).Distinct().ToArray();
