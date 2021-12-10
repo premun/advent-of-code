@@ -45,7 +45,7 @@ class SegmentMapper
     public void ResolveDigits(string[] signals)
     {
         var orderedSignals = signals
-            .OrderBy(digit => digit.Length == 2 || digit.Length == 3 || digit.Length == 4 || digit.Length == 7 ? -1 : 1)
+            .OrderBy(digit => digit.Length is 2 or 3 or 4 or 7 ? -1 : 1) // Optimization
             .ToDictionary(d => d, d => FindMappings(d).ToHashSet());
 
         var disallowedMappings = FindDisallowedMappings(orderedSignals, new HashSet<Mapping>());
