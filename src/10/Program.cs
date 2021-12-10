@@ -1,4 +1,5 @@
-﻿using Common;
+﻿using _10;
+using Common;
 
 var lines = Resources.GetResourceFileLines("input.txt");
 
@@ -9,39 +10,6 @@ Dictionary<char, char> pairs = new()
     { '{', '}' },
     { '<', '>' },
 };
-
-char? FindCorruptedChar(string line)
-{
-    var stack = new Stack<char>();
-
-    foreach (var current in line)
-    {
-        if (pairs.ContainsKey(current))
-        {
-            // current is opening bracket
-            stack.Push(current);
-        }
-        else
-        {
-            // current is closing bracket
-            if (stack.TryPop(out var opening))
-            {
-                if (!pairs.ContainsKey(opening) || current != pairs[opening])
-                {
-                    // Wrong bracket => corrupted line
-                    return current;
-                }
-            }
-            else
-            {
-                // Nothing to pop => corrupted line
-                return current;
-            }
-        }
-    }
-
-    return null;
-}
 
 IEnumerable<char> CompleteLine(string line)
 {
@@ -62,30 +30,22 @@ IEnumerable<char> CompleteLine(string line)
                 if (!pairs.ContainsKey(opening) || current != pairs[opening])
                 {
                     // Wrong bracket => corrupted line
-                    yield break;
+                    throw new CorruptedLineException(current);
                 }
             }
             else
             {
                 // Nothing to pop => corrupted line
-                yield break;
+                throw new CorruptedLineException(current);
             }
         }
     }
 
-    while (stack.TryPop(out var c))
-    {
-        yield return pairs[c];
-    }
+    return stack.Select(c => pairs[c]);
 }
 
-static int ScoreCorruption(char? c)
+static int ScoreCorruption(char c)
 {
-    if (!c.HasValue)
-    {
-        return 0;
-    }
-
     return c switch
     {
         ')' => 3,
@@ -96,7 +56,7 @@ static int ScoreCorruption(char? c)
     };
 }
 
-long ScoreCompletion(IEnumerable<char> missing)
+static long ScoreCompletion(IEnumerable<char> missing)
 {
     if (!missing.Any())
     {
@@ -115,13 +75,25 @@ long ScoreCompletion(IEnumerable<char> missing)
         .Aggregate((acc, score) => acc * 5 + score);
 }
 
-Console.WriteLine($"Part 1: {lines.Select(FindCorruptedChar).Select(ScoreCorruption).Sum()}");
+long corruptionScore = 0;
+List<long> completionScores = new();
 
-var scores = lines
-    .Select(CompleteLine)
-    .Select(ScoreCompletion)
+foreach (var line in lines)
+{
+    try
+    {
+        completionScores.Add(ScoreCompletion(CompleteLine(line)));
+    }
+    catch (CorruptedLineException e)
+    {
+        corruptionScore += ScoreCorruption(e.CorruptedChar);
+    }
+}
+
+var scores = completionScores
     .Where(s => s > 0)
     .OrderBy(s => s)
     .ToArray();
 
+Console.WriteLine($"Part 1: {corruptionScore}");
 Console.WriteLine($"Part 2: {scores[scores.Length / 2]}");
