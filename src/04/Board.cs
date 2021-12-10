@@ -30,16 +30,16 @@ class Board
         .Select(index => _numbers[index.Row, index.Column])
         .Aggregate((acc, number) => acc + number);
 
+    public void Reset()
+    {
+        _crossed = new bool[Size, Size];
+    }
+
     private bool IsWinning()
         => Enumerable.Range(0, Size).Any(i => IsRowWinning(i) || IsColumnWinning(i));
 
     private bool IsRowWinning(int row)
         => !Enumerable.Range(0, Size).Any(column => !_crossed[row, column]);
-
-    public void Reset()
-    {
-        _crossed = new bool[Size, Size];
-    }
 
     private bool IsColumnWinning(int column)
         => !Enumerable.Range(0, Size).Any(row => !_crossed[row, column]);
