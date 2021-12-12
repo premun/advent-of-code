@@ -21,35 +21,52 @@ foreach (var line in lines)
         caves.Add(parts[1], cave2);
     }
 
-    cave1.Paths.Add(cave2);
-    cave2.Paths.Add(cave1);
+    if (cave2.Name != "start" && cave1.Name != "end")
+    {
+        cave1.Paths.Add(cave2);
+    }
+
+    if (cave1.Name != "start" && cave2.Name != "end")
+    {
+        cave2.Paths.Add(cave1);
+    }
 }
 
-static List<List<Cave>> FindAllPaths(Cave from, Cave to)
+static List<List<Cave>> FindAllPaths(Cave from, Cave to, bool allowSmallCaveReentry)
 {
-    return FindPaths(new(), from, to);
+    return FindPaths(new(), from, to, allowSmallCaveReentry);
 }
 
-static List<List<Cave>> FindPaths(List<Cave> path, Cave current, Cave to)
+static List<List<Cave>> FindPaths(List<Cave> path, Cave current, Cave to, bool allowSmallCaveReentry)
 {
     if (current == to)
     {
-        return new() { path.Append(to).ToList() };
+        return new() { path/*.Append(to).ToList()*/ };
     }
+
+    path.Add(current);
 
     var paths = new List<List<Cave>>();
 
+    var pathLeadsThroughTwoSmalls = path.Any(p => p.IsSmall && path.Count(q => q.Name == p.Name) == 2);
+
     foreach (var cave in current.Paths)
     {
-        if (cave.IsSmall && path.Contains(cave))
+        if (cave.IsSmall && (pathLeadsThroughTwoSmalls || !allowSmallCaveReentry) && path.Contains(cave))
         {
             continue;
         }
 
-        paths.AddRange(FindPaths(path.Append(current).ToList(), cave, to));
+        paths.AddRange(FindPaths(path.ToList(), cave, to, allowSmallCaveReentry));
     }
 
     return paths;
 }
 
-Console.WriteLine($"Part 1: {FindAllPaths(caves["start"], caves["end"]).Count}");
+Console.WriteLine($"Part 1: {FindAllPaths(caves["start"], caves["end"], false).Count}");
+Console.WriteLine($"Part 2: {FindAllPaths(caves["start"], caves["end"], true).Count}");
+
+//foreach (var path in FindAllPaths(caves["start"], caves["end"], true))
+//{
+//    Console.WriteLine(string.Join(",", path.Select(p => p.Name)));
+//}
