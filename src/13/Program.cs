@@ -35,14 +35,41 @@ foreach (var line in lines)
 
 static HashSet<Coor> Fold(HashSet<Coor> coors, Fold fold)
 {
-    var result = new HashSet<Coor>();
+    return coors.Select(coor => fold.Transform(coor)).ToHashSet();
+}
 
-    foreach (var coor in coors)
+static void Display(HashSet<Coor> coors)
+{
+    var last = new Coor(0, 0);
+    foreach (var point in coors.OrderBy(p => p.Row).ThenBy(p => p.Column))
     {
-        result.Add(fold.Transform(coor));
-    }
+        for (int i = last.Row; i < point.Row; i++)
+        {
+            Console.WriteLine();
+            last = new Coor(0, point.Row);
+        }
 
-    return result;
+        for (int i = last.Column; i < point.Column; i++)
+        {
+            Console.Write(' ');
+        }
+
+        Console.Write('#');
+
+        last = point with
+        {
+            Column = point.Column + 1,
+        };
+    }
 }
 
 Console.WriteLine($"Part 1: {Fold(points, folds.First()).Count}");
+
+foreach (var fold in folds)
+{
+    points = Fold(points, fold);
+}
+
+Console.WriteLine($"Part 2: {points.Count}");
+
+Display(points);
