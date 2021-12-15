@@ -1,70 +1,76 @@
-﻿namespace _15;
+﻿using Priority_Queue;
+
+namespace _15;
 
 class PathFinder
 {
     private readonly int[][] _map;
-    private readonly int[,] _shortestMap;
     private readonly int _maxY;
     private readonly int _maxX;
 
     public PathFinder(int[][] map)
     {
         _map = map;
-        _maxY = map.Length;
-        _maxX = map[0].Length;
-
-        _shortestMap = new int[_maxY, _maxX];
+        _maxY = map.Length - 1;
+        _maxX = map[0].Length - 1;
     }
-
-    public int CurrentShortestPath => _shortestMap[_maxY - 1, _maxX - 1];
 
     public int Search()
     {
-        for (int y = 0; y < _maxY; y++)
+        var shortestPaths = new int[_maxY + 1, _maxX + 1];
+        var estimatedPaths = new int[_maxY + 1, _maxX + 1];
+
+        for (int y = 0; y <= _maxY; y++)
         {
-            for (int x = 0; x < _maxX; x++)
+            for (int x = 0; x <= _maxX; x++)
             {
-                _shortestMap[y, x] = int.MaxValue;
+                shortestPaths[y, x] = int.MaxValue;
+                estimatedPaths[y, x] = int.MaxValue;
             }
         }
 
-        Search(0, new() { new Coor(0, 0) });
-        return CurrentShortestPath;
+        shortestPaths[0, 0] = 0;
+        estimatedPaths[0, 0] = EstimateCost(new Coor(0, 0));
+
+        var openSet = new SimplePriorityQueue<Coor, int>();
+        openSet.Enqueue(new Coor(0, 0), estimatedPaths[0, 0]);
+
+        while (openSet.Count > 0)
+        {
+            var current = openSet.First;
+
+            if (current.X == _maxX && current.Y == _maxY)
+            {
+                return shortestPaths[_maxY, _maxX];
+            }
+
+            openSet.Dequeue();
+
+            foreach (var neighbour in GetNeighbourhs(current))
+            {
+                var tentativeScore = shortestPaths[current.Y, current.X] + _map[current.Y][current.X];
+
+                if (tentativeScore < shortestPaths[neighbour.Y, neighbour.X])
+                {
+                    shortestPaths[neighbour.Y, neighbour.X] = tentativeScore;
+                    estimatedPaths[neighbour.Y, neighbour.X] = tentativeScore + EstimateCost(neighbour);
+
+                    if (!openSet.Contains(neighbour))
+                    {
+                        openSet.Enqueue(neighbour, estimatedPaths[neighbour.Y, neighbour.X]);
+                    }
+                    else
+                    {
+                        openSet.UpdatePriority(neighbour, estimatedPaths[neighbour.Y, neighbour.X]);
+                    }
+                }
+            }
+        }
+
+        throw new Exception("???");
     }
 
-    private void Search(int currentLength, List<Coor> currentPath)
-    {
-        if (currentLength >= CurrentShortestPath)
-        {
-            return;
-        }
-
-        var position = currentPath.Last();
-
-        if (_shortestMap[position.Y, position.X] < currentLength)
-        {
-            return;
-        }
-
-        _shortestMap[position.Y, position.X] = currentLength;
-
-        if (position == new Coor(_maxY - 1, _maxX - 1))
-        {
-            Console.WriteLine(CurrentShortestPath);
-            return;
-        }
-
-        var neighbours = GetNeighbourhs(position)
-            .Where(n => _shortestMap[n.Y, n.X] >= currentLength)
-            .Where(n => !currentPath.Contains(n));
-
-        foreach (var neighbour in neighbours)
-        {
-            Search(currentLength + _map[position.Y][position.X], currentPath.Append(neighbour).ToList());
-        }
-    }
-
-    private Coor[] GetNeighbourhs(Coor coor)
+    private IEnumerable<Coor> GetNeighbourhs(Coor coor)
     {
         var neighbours = new[]
         {
@@ -74,8 +80,10 @@ class PathFinder
             coor + new Coor(0, -1),
         };
 
-        return neighbours.Where(n => !IsOutOfBounds(n)).ToArray();
+        return neighbours.Where(n => !IsOutOfBounds(n));
     }
 
-    private bool IsOutOfBounds(Coor coor) => coor.X < 0 || coor.Y < 0 || coor.Y >= _maxY || coor.X >= _maxX;
+    private bool IsOutOfBounds(Coor coor) => coor.X < 0 || coor.Y < 0 || coor.Y > _maxY || coor.X > _maxX;
+
+    private int EstimateCost(Coor coor) => _maxX - coor.X + _maxY - coor.Y;
 }
