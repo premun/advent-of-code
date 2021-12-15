@@ -15,53 +15,50 @@ class PathFinder
         _maxX = map[0].Length - 1;
     }
 
-    public int Search()
+    public int FindShortestPath()
     {
         var shortestPaths = new int[_maxY + 1, _maxX + 1];
-        var estimatedPaths = new int[_maxY + 1, _maxX + 1];
 
         for (int y = 0; y <= _maxY; y++)
         {
             for (int x = 0; x <= _maxX; x++)
             {
                 shortestPaths[y, x] = int.MaxValue;
-                estimatedPaths[y, x] = int.MaxValue;
             }
         }
 
         shortestPaths[0, 0] = 0;
-        estimatedPaths[0, 0] = EstimateCost(new Coor(0, 0));
 
-        var openSet = new SimplePriorityQueue<Coor, int>();
-        openSet.Enqueue(new Coor(0, 0), estimatedPaths[0, 0]);
+        var queue = new SimplePriorityQueue<Coor, int>();
+        queue.Enqueue(new Coor(0, 0), 0);
 
-        while (openSet.Count > 0)
+        while (queue.Count > 0)
         {
-            var current = openSet.First;
+            var current = queue.First;
 
             if (current.X == _maxX && current.Y == _maxY)
             {
-                return shortestPaths[_maxY, _maxX];
+                // Corrections of the value for the sake of how we account for starting/ending fields
+                // We don't count starting field but have to count last field
+                return shortestPaths[_maxY, _maxX] - _map[0][0] + _map[_maxY][_maxY];
             }
 
-            openSet.Dequeue();
+            queue.Dequeue();
 
             foreach (var neighbour in GetNeighbourhs(current))
             {
                 var tentativeScore = shortestPaths[current.Y, current.X] + _map[current.Y][current.X];
-
                 if (tentativeScore < shortestPaths[neighbour.Y, neighbour.X])
                 {
                     shortestPaths[neighbour.Y, neighbour.X] = tentativeScore;
-                    estimatedPaths[neighbour.Y, neighbour.X] = tentativeScore + EstimateCost(neighbour);
 
-                    if (!openSet.Contains(neighbour))
+                    if (!queue.Contains(neighbour))
                     {
-                        openSet.Enqueue(neighbour, estimatedPaths[neighbour.Y, neighbour.X]);
+                        queue.Enqueue(neighbour, tentativeScore);
                     }
                     else
                     {
-                        openSet.UpdatePriority(neighbour, estimatedPaths[neighbour.Y, neighbour.X]);
+                        queue.UpdatePriority(neighbour, tentativeScore);
                     }
                 }
             }
@@ -84,6 +81,4 @@ class PathFinder
     }
 
     private bool IsOutOfBounds(Coor coor) => coor.X < 0 || coor.Y < 0 || coor.Y > _maxY || coor.X > _maxX;
-
-    private int EstimateCost(Coor coor) => _maxX - coor.X + _maxY - coor.Y;
 }
