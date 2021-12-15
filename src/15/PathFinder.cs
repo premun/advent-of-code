@@ -1,6 +1,4 @@
-﻿using Priority_Queue;
-
-namespace _15;
+﻿namespace _15;
 
 class PathFinder
 {
@@ -29,12 +27,12 @@ class PathFinder
 
         shortestPaths[0, 0] = 0;
 
-        var queue = new SimplePriorityQueue<Coor, int>();
+        var queue = new PriorityQueue<Coor, int>();
         queue.Enqueue(new Coor(0, 0), 0);
 
         while (queue.Count > 0)
         {
-            var current = queue.First;
+            var current = queue.Peek();
 
             if (current.X == _maxX && current.Y == _maxY)
             {
@@ -51,15 +49,7 @@ class PathFinder
                 if (tentativeScore < shortestPaths[neighbour.Y, neighbour.X])
                 {
                     shortestPaths[neighbour.Y, neighbour.X] = tentativeScore;
-
-                    if (!queue.Contains(neighbour))
-                    {
-                        queue.Enqueue(neighbour, tentativeScore);
-                    }
-                    else
-                    {
-                        queue.UpdatePriority(neighbour, tentativeScore);
-                    }
+                    queue.Enqueue(neighbour, tentativeScore);
                 }
             }
         }
