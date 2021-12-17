@@ -3,7 +3,7 @@ using Common;
 
 var input = Resources.GetResourceFileLines("input.txt").First();
 
-var packet = Packet.FromStream(new BitReader(input));
+var packet = Packet.ParseFromStream(new BitReader(input));
 
 static int SumVersions(Packet packet)
 {
