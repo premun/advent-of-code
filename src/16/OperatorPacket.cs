@@ -19,21 +19,21 @@ record OperatorPacket : Packet
 
         if (!lengthTypeId)
         {
-            var totalLength = (int)reader.ReadNumber(15);
+            var totalLength = reader.ReadNumber(15);
             var limit = reader.Position + totalLength;
 
             while (reader.Position < limit)
             {
-                subpackets.Add(FromStream(reader));
+                subpackets.Add(ParseFromStream(reader));
             }
         }
         else
         {
-            int numOfSubpackets = (int)reader.ReadNumber(11);
+            var numOfSubpackets = reader.ReadNumber(11);
 
-            for (int i = 0; i < numOfSubpackets; i++)
+            while (subpackets.Count < numOfSubpackets)
             {
-                subpackets.Add(FromStream(reader));
+                subpackets.Add(ParseFromStream(reader));
             }
         }
 

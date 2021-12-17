@@ -4,7 +4,7 @@ abstract record Packet(int Version, int TypeId)
 {
     public abstract long Value { get; }
 
-    public static Packet FromStream(BitReader reader)
+    public static Packet ParseFromStream(BitReader reader)
     {
         var version = (int)reader.ReadNumber(3);
         var typeId = (int)reader.ReadNumber(3);
