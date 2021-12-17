@@ -1,8 +1,24 @@
 ﻿using _16;
 using Common;
 
-var input = "38006F45291200";// Resources.GetResourceFileLines("input.txt").First();
+var input = Resources.GetResourceFileLines("input.txt").First();
 
-var packet = Packet.FromHexadecimal(input);
+var packet = Packet.FromStream(new BitReader(input));
 
-Console.WriteLine((packet as LiteralPacket)!.Value);
+static int SumVersions(Packet packet)
+{
+    if (packet is LiteralPacket)
+    {
+        return packet.Version;
+    }
+
+    if (packet is OperatorPacket operatorPacket)
+    {
+        return packet.Version + operatorPacket.Subpackets.Select(SumVersions).Sum();
+    }
+
+    throw new Exception("???");
+}
+
+Console.WriteLine($"Part1: {SumVersions(packet)}");
+Console.WriteLine($"Part2: {packet.Value}");
