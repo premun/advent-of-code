@@ -1,13 +1,11 @@
 ﻿namespace _18;
 
-class SnailfishParser
+static class SnailfishParser
 {
-    private readonly Stack<SnailfishNumber> _stack = new();
-
-    public SnailfishNumber Parse(string input)
+    public static SnailfishNumber Parse(string input)
     {
         var reader = new TokenReader(input);
-        _stack.Clear();
+        var stack = new Stack<SnailfishNumber>();
 
         while (true)
         {
@@ -20,27 +18,27 @@ class SnailfishParser
                     break;
 
                 case Token.Literal:
-                    _stack.Push(new Literal(literal));
+                    stack.Push(new Literal(literal));
                     break;
 
                 case Token.End:
-                    var right = _stack.Pop();
-                    var left = _stack.Pop();
+                    var right = stack.Pop();
+                    var left = stack.Pop();
 
                     var newNumber = new Pair(right: right, left: left);
                     newNumber.Reduce();
 
-                    _stack.Push(newNumber);
+                    stack.Push(newNumber);
 
                     break;
 
                 case Token.EndOfStream:
-                    if (_stack.Count != 1)
+                    if (stack.Count != 1)
                     {
-                        throw new InvalidOperationException($"Invalid count ({_stack.Count}) of token at the EOF!");
+                        throw new InvalidOperationException($"Invalid count ({stack.Count}) of token at the EOF!");
                     }
 
-                    return _stack.Pop();
+                    return stack.Pop();
 
                 default:
                     throw new Exception("???");

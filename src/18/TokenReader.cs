@@ -15,6 +15,8 @@ class TokenReader
 
     public int Position { get; private set; } = 0;
 
+    public bool EndOfStream => Position == _source.Length;
+
     public TokenReader(string source)
     {
         _source = source;
@@ -24,7 +26,7 @@ class TokenReader
     {
         literalValue = 0;
 
-        if (Position == _source.Length)
+        if (EndOfStream)
         {
             return Token.EndOfStream;
         }
@@ -44,7 +46,7 @@ class TokenReader
                 return Token.Delimeter;
 
             default:
-                while (Position < _source.Length && Current >= '0' && Current <= '9')
+                while (!EndOfStream && char.IsNumber(Current))
                 {
                     literalValue *= 10;
                     literalValue += Current - '0';
