@@ -10,11 +10,11 @@ var coordinates = input
     .Select(int.Parse)
     .ToArray();
 
-Coor from = new Coor(X: Math.Min(coordinates[0], coordinates[1]), Y: Math.Max(coordinates[2], coordinates[3]));
-Coor to = new Coor(X: Math.Max(coordinates[0], coordinates[1]), Y: Math.Min(coordinates[2], coordinates[3]));
+Coor from = new(X: Math.Min(coordinates[0], coordinates[1]), Y: Math.Max(coordinates[2], coordinates[3]));
+Coor to = new(X: Math.Max(coordinates[0], coordinates[1]), Y: Math.Min(coordinates[2], coordinates[3]));
 
 // Minimal speed to reach the nearest part of the target (gives us the most time to fire up)
-var minXVelocity = (int)Math.Floor((1 + Math.Sqrt(1 + from.X * 8)) / 2);
+var minXVelocity = (int)Math.Ceiling((Math.Sqrt(1 + from.X * 8) - 1) / 2);
 
 bool IsHit(Coor speed, out int maxHeight)
 {
@@ -73,4 +73,4 @@ int GetPossibleVelocityCount()
 }
 
 Console.WriteLine($"Part 1: {GetMaxHeight()}");
-Console.WriteLine($"Part 1: {GetPossibleVelocityCount()}");
+Console.WriteLine($"Part 2: {GetPossibleVelocityCount()}");
