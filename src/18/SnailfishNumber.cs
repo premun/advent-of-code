@@ -8,6 +8,8 @@ abstract class SnailfishNumber
 
     public Pair? Parent { get; set; }
 
+    public abstract SnailfishNumber Clone();
+
     internal abstract bool TryExplode(int depth);
 
     internal abstract bool TrySplit();
@@ -33,13 +35,11 @@ abstract class SnailfishNumber
             Parent.Right = newNode;
             return;
         }
-
-        throw new InvalidOperationException();
     }
 
     public static SnailfishNumber operator +(SnailfishNumber first, SnailfishNumber second)
     {
-        var addedNumber = new Pair(left: first, right: second);
+        var addedNumber = new Pair(left: first.Clone(), right: second.Clone());
         addedNumber.Reduce();
         return addedNumber;
     }
