@@ -24,8 +24,7 @@ class Board
         return IsWinning();
     }
 
-    public int GetSumOfRemainingNumbers()
-        => GetAllIndeces()
+    public int GetSumOfRemainingNumbers() => GetAllIndeces()
         .Where(index => !_crossed[index.Row, index.Column])
         .Select(index => _numbers[index.Row, index.Column])
         .Aggregate((acc, number) => acc + number);
@@ -45,7 +44,7 @@ class Board
         => !Enumerable.Range(0, Size).Any(row => !_crossed[row, column]);
 
     private static IEnumerable<(int Row, int Column)> GetAllIndeces() =>
-        Enumerable.Range(0, Size).SelectMany(x => Enumerable.Range(0, Size).Select(y => (x, y)));
+        Enumerable.Range(0, Size).AllCombinations();
 
     public static Board FromStream(StreamReader stream)
     {
