@@ -26,11 +26,8 @@ class SnailfishParser
                 case Token.End:
                     var right = _stack.Pop();
                     var left = _stack.Pop();
-                    var newNumber = new Pair(Right: right, Left: left);
 
-                    left.Parent = newNumber;
-                    right.Parent = newNumber;
-
+                    var newNumber = new Pair(right: right, left: left);
                     newNumber.Reduce();
 
                     _stack.Push(newNumber);
