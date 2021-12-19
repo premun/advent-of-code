@@ -30,4 +30,9 @@ class Literal : SnailfishNumber
     internal override Literal FindLeaf(bool rightLeaf) => this;
 
     public override string ToString() => Value.ToString();
+
+    public override SnailfishNumber Clone() => new Literal(Value)
+    {
+        Parent = Parent
+    };
 }

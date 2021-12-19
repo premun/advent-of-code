@@ -66,19 +66,23 @@ class Pair : SnailfishNumber
             var leftNeighbour = FindLeftNeighbour();
             var rightNeighbour = FindRightNeighbour();
 
+            if (leftNeighbour == null && rightNeighbour == null)
+            {
+                // Nowhere to explode, no-op
+                return false;
+            }
+
             if (rightNeighbour != null)
             {
                 if (leftNeighbour == null)
                 {
                     rightNeighbour.Value += right.Value;
-                    ReplaceSelf(new Literal(0));
                 }
                 else
                 {
                     // Can explode to both sides
                     rightNeighbour.Value += right.Value;
                     leftNeighbour.Value += left.Value;
-                    ReplaceSelf(new Literal(0));
                 }
             }
             else
@@ -86,15 +90,10 @@ class Pair : SnailfishNumber
                 if (leftNeighbour != null)
                 {
                     leftNeighbour.Value += left.Value;
-                    ReplaceSelf(new Literal(0));
-                }
-                else
-                {
-                    // Nowhere to explode, no-op
-                    return false;
                 }
             }
 
+            ReplaceSelf(new Literal(0));
             return true;
         }
 
@@ -153,6 +152,20 @@ class Pair : SnailfishNumber
                     throw new Exception("???");
             }
         }
+    }
+
+    public override SnailfishNumber Clone()
+    {
+        var left = Left.Clone();
+        var right = Right.Clone();
+
+        left.Parent = this;
+        right.Parent = this;
+
+        return new Pair(left: left, right: right)
+        {
+            Parent = Parent
+        };
     }
 
     public override string ToString() => $"[{Left},{Right}]";
