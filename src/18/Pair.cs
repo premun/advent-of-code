@@ -40,64 +40,57 @@ class Pair : SnailfishNumber
     {
         while (true)
         {
-            if (TryExplode(0))
+            if (!TryExplode(0) && !TrySplit())
             {
-                continue;
+                break;
             }
-
-            if (TrySplit())
-            {
-                continue;
-            }
-
-            break;
         }
     }
 
     internal override bool TryExplode(int depth)
     {
-        if (depth == 4)
+        if (depth != 4)
         {
-            if (Left is not Literal left || Right is not Literal right)
-            {
-                throw new Exception("Depth 5 detected!");
-            }
+            return Left.TryExplode(depth + 1) || Right.TryExplode(depth + 1);
+        }
 
-            var leftNeighbour = FindLeftNeighbour();
-            var rightNeighbour = FindRightNeighbour();
+        if (Left is not Literal left || Right is not Literal right)
+        {
+            throw new Exception("Depth 5 detected!");
+        }
 
-            if (leftNeighbour == null && rightNeighbour == null)
-            {
-                // Nowhere to explode, no-op
-                return false;
-            }
+        var leftNeighbour = FindLeftNeighbour();
+        var rightNeighbour = FindRightNeighbour();
 
-            if (rightNeighbour != null)
+        if (leftNeighbour == null && rightNeighbour == null)
+        {
+            // Nowhere to explode, no-op
+            return false;
+        }
+
+        if (rightNeighbour != null)
+        {
+            if (leftNeighbour == null)
             {
-                if (leftNeighbour == null)
-                {
-                    rightNeighbour.Value += right.Value;
-                }
-                else
-                {
-                    // Can explode to both sides
-                    rightNeighbour.Value += right.Value;
-                    leftNeighbour.Value += left.Value;
-                }
+                rightNeighbour.Value += right.Value;
             }
             else
             {
-                if (leftNeighbour != null)
-                {
-                    leftNeighbour.Value += left.Value;
-                }
+                // Can explode to both sides
+                rightNeighbour.Value += right.Value;
+                leftNeighbour.Value += left.Value;
             }
-
-            ReplaceSelf(new Literal(0));
-            return true;
+        }
+        else
+        {
+            if (leftNeighbour != null)
+            {
+                leftNeighbour.Value += left.Value;
+            }
         }
 
-        return Left.TryExplode(depth + 1) || Right.TryExplode(depth + 1);
+        ReplaceSelf(new Literal(0));
+        return true;
     }
 
     internal override bool TrySplit() => Left.TrySplit() || Right.TrySplit();

@@ -27,22 +27,17 @@ abstract class SnailfishNumber
         if (IsLeftChild)
         {
             Parent.Left = newNode;
-            return;
         }
-
-        if (IsRightChild)
+        else if (IsRightChild)
         {
             Parent.Right = newNode;
-            return;
         }
     }
 
     public static SnailfishNumber operator +(SnailfishNumber first, SnailfishNumber second)
     {
-        var addedNumber = new Pair(left: first.Clone(), right: second.Clone());
-        addedNumber.Reduce();
-        return addedNumber;
+        var result = new Pair(left: first.Clone(), right: second.Clone());
+        result.Reduce();
+        return result;
     }
-
-    public static SnailfishNumber FromString(string number) => new SnailfishParser().Parse(number);
 }
