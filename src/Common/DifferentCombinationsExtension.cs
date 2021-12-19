@@ -4,17 +4,14 @@ public static class DifferentCombinationsExtension
 {
     public static IEnumerable<(T, T)> AllCombinations<T>(this IEnumerable<T> elements, bool includeIdentities = true, bool orderSensitive = false)
     {
-        if (orderSensitive)
-        {
-            return elements
-                .SelectMany(e => elements.Where(f => includeIdentities || !EqualityComparer<T>.Default.Equals(e, f))
-                .SelectMany(f => new[] { (e, f), (f, e) }));
-        }
-        else
-        {
-            return elements
-                .SelectMany(e => elements.Where(f => includeIdentities || !EqualityComparer<T>.Default.Equals(e, f))
-                .Select(f => (e, f) ));
-        }
+        var query =
+            from e1 in elements
+            from e2 in elements
+            where includeIdentities || !EqualityComparer<T>.Default.Equals(e1, e2)
+            select (e1, e2);
+
+        return orderSensitive
+            ? query.SelectMany(pair => new[] { (pair.e1, pair.e2), (pair.e2, pair.e1) })
+            : query;
     }
 }
