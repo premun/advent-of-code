@@ -41,15 +41,15 @@ static HashSet<Coor> Fold(HashSet<Coor> coors, Fold fold)
 static void Display(HashSet<Coor> coors)
 {
     var last = new Coor(0, 0);
-    foreach (var point in coors.OrderBy(p => p.Row).ThenBy(p => p.Column))
+    foreach (var point in coors.OrderBy(p => p.Y).ThenBy(p => p.X))
     {
-        for (int i = last.Row; i < point.Row; i++)
+        for (int i = last.Y; i < point.Y; i++)
         {
             Console.WriteLine();
-            last = new Coor(0, point.Row);
+            last = new Coor(0, point.Y);
         }
 
-        for (int i = last.Column; i < point.Column; i++)
+        for (int i = last.X; i < point.X; i++)
         {
             Console.Write(' ');
         }
@@ -58,7 +58,7 @@ static void Display(HashSet<Coor> coors)
 
         last = point with
         {
-            Column = point.Column + 1,
+            X = point.X + 1,
         };
     }
 }

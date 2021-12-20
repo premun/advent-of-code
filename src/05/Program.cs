@@ -1,5 +1,4 @@
-﻿using _06;
-using Common;
+﻿using Common;
 
 var coordinates = Resources.GetResourceFileLines("input.txt")
     .Select(line =>

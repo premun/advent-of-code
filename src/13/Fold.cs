@@ -1,4 +1,6 @@
-﻿namespace _13;
+﻿using Common;
+
+namespace _13;
 
 abstract record Fold
 {
@@ -9,11 +11,11 @@ record XFold(int Position) : Fold
 {
     public override Coor Transform(Coor coor)
     {
-        if (coor.Column > Position)
+        if (coor.X > Position)
         {
             coor = coor with
             {
-                Column = Position - (coor.Column - Position)
+                X = Position - (coor.X - Position)
             };
         }
 
@@ -25,11 +27,11 @@ record YFold(int Position) : Fold
 {
     public override Coor Transform(Coor coor)
     {
-        if (coor.Row > Position)
+        if (coor.Y > Position)
         {
             coor = coor with
             {
-                Row = Position - (coor.Row - Position)
+                Y = Position - (coor.Y - Position)
             };
         }
 
