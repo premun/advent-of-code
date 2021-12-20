@@ -5,8 +5,8 @@ var depths = Resources.GetResourceFileLines("input.txt").Select(int.Parse).ToArr
 static int GetIncreaseCount(int[] depths, int lookback)
 {
     return depths
-        .Select((d, index) => (d, index < lookback ? int.MaxValue : depths[index - lookback]))
-        .Count(pair => pair.Item1 > pair.Item2);
+        .Select((d, index) => (Current: d, Previous: index < lookback ? int.MaxValue : depths[index - lookback]))
+        .Count(pair => pair.Current > pair.Previous);
 }
 
 Console.WriteLine($"Part 1: {GetIncreaseCount(depths, 1)}");
