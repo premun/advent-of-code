@@ -2,7 +2,7 @@
 using Common;
 
 var lines = Resources.GetResourceFileLines("input.txt");
-var enhancementAlgorithm = Array.AsReadOnly(lines.First().Select(c => c == '#').ToArray());
+var enhancementAlgorithm = lines.First().Select(c => c == '#').ToList().AsReadOnly();
 
 var image = lines.Skip(1).Select(line => line.Select(c => c == '#').ToArray()).ToArray();
 
@@ -19,7 +19,5 @@ for (int i = 1; i <= 50; i++)
 }
 
 Console.WriteLine($"Part 2: {image.SelectMany(row => row).Count(pixel => pixel)}");
-
-Console.WriteLine();
 
 ImageEnhancer.Display(image);
