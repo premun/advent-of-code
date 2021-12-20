@@ -1,4 +1,6 @@
-﻿namespace _15;
+﻿using Common;
+
+namespace _15;
 
 class PathFinder
 {

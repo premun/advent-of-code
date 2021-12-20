@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Common;
 
 namespace _20;
 
@@ -75,15 +76,13 @@ class ImageEnhancer
     {
         var value = 0;
         var position = new Coor(Y: y, X: x);
-        var height = image.Length;
-        var width = image[0].Length;
 
         foreach (var c in s_arounds)
         {
             value <<= 1;
 
             var coor = position + c;
-            if (coor.Y >= 0 && coor.Y < height && coor.X >= 0 && coor.X < width)
+            if (coor.Y >= 0 && coor.Y < image.Length && coor.X >= 0 && coor.X < image[0].Length)
             {
                 // Within bounds, we look at the input image
                 if (image[coor.Y][coor.X])

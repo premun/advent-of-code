@@ -1,5 +1,4 @@
-﻿using _11;
-using Common;
+﻿using Common;
 
 var map = Resources.GetResourceFileLines("input.txt")
     .Select(line => line.Select(n => n - '0').ToArray())
@@ -43,14 +42,14 @@ static int Step(int[][] map)
             var around = flashing + direction;
 
             // Out of bounds
-            if (around.Row < 0 || around.Column < 0 || around.Row >= map.Length || around.Column >= map[0].Length)
+            if (around.Y < 0 || around.X < 0 || around.Y >= map.Length || around.X >= map[0].Length)
             {
                 continue;
             }
 
-            if (++map[around.Row][around.Column] == 10)
+            if (++map[around.Y][around.X] == 10)
             {
-                flashingOctos.Enqueue(new Coor(around.Row, around.Column));
+                flashingOctos.Enqueue(new Coor(around.Y, around.X));
             }
         }
     }
@@ -60,7 +59,7 @@ static int Step(int[][] map)
     // Reset flashed to 0
     while (flashedOctos.TryDequeue(out var flashed))
     {
-        map[flashed.Row][flashed.Column] = 0;
+        map[flashed.Y][flashed.X] = 0;
     }
 
     return flashes;

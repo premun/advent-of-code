@@ -1,5 +1,4 @@
-﻿using _17;
-using Common;
+﻿using Common;
 
 var input = Resources.GetResourceFileLines("input.txt").First();
 
