@@ -4,7 +4,7 @@ namespace _20;
 
 class ImageEnhancer
 {
-    private static readonly IEnumerable<Coor> _arounds = new Coor[]
+    private static readonly IEnumerable<Coor> s_arounds = new Coor[]
     {
         new (-1, -1),
         new (-1, 0),
@@ -20,17 +20,20 @@ class ImageEnhancer
     };
 
     private readonly ReadOnlyCollection<bool> _algorithm;
-    private bool _backgroundColor = false;
+
+    // Represents what colour is the inifinite surrounding
+    private bool _surroundingColor = false;
 
     public ImageEnhancer(ReadOnlyCollection<bool> algorithm)
     {
         _algorithm = algorithm;
     }
 
-    public bool[][] Enhance(bool[][] image, int boundary = 1)
+    public bool[][] Enhance(bool[][] image)
     {
         var height = image.Length;
         var width = image[0].Length;
+        int boundary = 2;
 
         var result = new bool[height + boundary * 2][];
 
@@ -44,12 +47,12 @@ class ImageEnhancer
             }
         }
 
-        // Resolve the infinite surroundings
+        // Check the infinite surroundings
         // If it is dark and 9 darks turn into a light => flip the background
         // If it is lit and 9 lights turn into dark => also flip
-        if ((!_backgroundColor && _algorithm[0]) || (_backgroundColor && _algorithm.Last()))
+        if ((!_surroundingColor && _algorithm[0]) || (_surroundingColor && !_algorithm.Last()))
         {
-            _backgroundColor = !_backgroundColor;
+            _surroundingColor = !_surroundingColor;
         }
 
         return result;
@@ -75,7 +78,7 @@ class ImageEnhancer
         var height = image.Length;
         var width = image[0].Length;
 
-        foreach (var c in _arounds)
+        foreach (var c in s_arounds)
         {
             value <<= 1;
 
@@ -91,7 +94,7 @@ class ImageEnhancer
             else
             {
                 // Outside of bounds, we check the fake infinite surroundings
-                if (_backgroundColor)
+                if (_surroundingColor)
                 {
                     value |= 1;
                 }
