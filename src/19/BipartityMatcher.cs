@@ -51,6 +51,6 @@ static class BipartityMatcher
             }
         }
 
-        return matchings.Where(m => m != -1).Select((matching, index) => (index, matching));
+        return matchings.Select((m, n) => (m, n)).Where(x => x.m != -1);
     }
 }

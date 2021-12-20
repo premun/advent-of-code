@@ -19,36 +19,16 @@ foreach (var line in lines)
     }
 }
 
-var scanners = scanners_.Select(x => x.ToArray()).ToArray();
-
-// Finds relative distances between all beacons
-static float[][] GetDistances(Vector3[] coors)
-{
-    var result = new List<float[]>();
-
-    foreach (var coor in coors)
-    {
-        result.Add(coors
-            .Where(c => c != coor)
-            .Select(c => Vector3.DistanceSquared(c, coor))
-            .ToArray());
-    }
-
-    return result.ToArray();
-}
-
 // Finds matching beacons from two scanners based on relative distances between them
-static List<(int, int)> GetMatchingBeacons(Vector3[] group1, Vector3[] group2)
+static List<(int, int)> GetMatchingBeacons(BeaconGroup group1, BeaconGroup group2)
 {
-    var relativeDistances = new[] { group1, group2 }.Select(GetDistances).ToArray();
+    var graph = new bool[group1.RelativeDistances.Length, group2.RelativeDistances.Length];
 
-    var graph = new bool[relativeDistances[0].Length, relativeDistances[1].Length];
-
-    for (int i = 0; i < relativeDistances[0].Length; i++)
+    for (int i = 0; i < group1.RelativeDistances.Length; i++)
     {
-        for (int j = 0; j < relativeDistances[1].Length; j++)
+        for (int j = 0; j < group2.RelativeDistances.Length; j++)
         {
-            graph[i, j] = relativeDistances[0][i].Intersect(relativeDistances[1][j]).Any();
+            graph[i, j] = group1.RelativeDistances[i].Intersect(group2.RelativeDistances[j]).Count() > 10;
         }
     }
 
@@ -56,7 +36,7 @@ static List<(int, int)> GetMatchingBeacons(Vector3[] group1, Vector3[] group2)
 }
 
 // Finds two scanners with at least 12 matching beacons
-static (int, int, List<(int, int)>) GetMatchingGroups(List<Vector3[]> groups)
+static (int, int, List<(int, int)>) GetMatchingGroups(List<BeaconGroup> groups)
 {
     for (var i = 0; i < groups.Count; ++i)
     {
@@ -74,30 +54,51 @@ static (int, int, List<(int, int)>) GetMatchingGroups(List<Vector3[]> groups)
     throw new Exception("No more matching groups");
 }
 
-var groups = scanners.ToList();
+var groups = scanners_.Select(x => new BeaconGroup(x.ToArray())).ToList();
 
 while (groups.Count > 1)
 {
+    groups = groups.OrderBy(a => Guid.NewGuid()).ToList();
+
     var (i, j, matchingBeacons) = GetMatchingGroups(groups);
 
     var group1 = groups[i];
     var group2 = groups[j];
 
-    groups.Remove(group1);
-    groups.Remove(group2);
+    Console.WriteLine($"From {groups.Count} joining {i} ({group1.Beacons.Length}) and {j} ({group2.Beacons.Length}) with {matchingBeacons.Count} matches");
 
-    var newGroup = new List<Vector3>(group1);
+    var selectedScanners = new List<(Vector3, float[])>();
 
-    for (int x = 0; x < group2.Length; x++)
+    for (int x = 0; x < group1.Beacons.Length; x++)
     {
-        if (!matchingBeacons.Any(m => m.Item2 == x))
+        if (matchingBeacons.Any(p => p.Item1 == x))
         {
-            newGroup.Add(group2[x]);
+            var matching = matchingBeacons.First(p => p.Item1 == x);
+            selectedScanners.Add((
+                group1.Beacons[x],
+                group1.RelativeDistances[x].Concat(group2.RelativeDistances[matching.Item2]).ToArray()));
+        }
+        else
+        {
+            selectedScanners.Add((group1.Beacons[x], group1.RelativeDistances[x]));
         }
     }
 
-    Console.WriteLine($"From {groups.Count} joining {i} and {j} with {matchingBeacons.Count} matches. New group size: {newGroup.Count}");
-    groups.Add(newGroup.ToArray());
+    for (int x = 0; x < group2.Beacons.Length; x++)
+    {
+        if (!matchingBeacons.Any(p => p.Item2 == x))
+        {
+            selectedScanners.Add((group2.Beacons[x], group2.RelativeDistances[x]));
+        }
+    }
+
+    var newGroup = new BeaconGroup(selectedScanners.Select(x => x.Item1).ToArray(), selectedScanners.Select(x => x.Item2).ToArray());
+
+    Console.WriteLine($"     New group size: {newGroup.Beacons.Length}");
+
+    groups.Remove(group1);
+    groups.Remove(group2);
+    groups.Add(newGroup);
 }
 
-Console.WriteLine($"Part 1: {groups.First().Length}");
+Console.WriteLine($"Part 1: {groups.First().Beacons.Length}");
