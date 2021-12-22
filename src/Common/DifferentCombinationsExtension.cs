@@ -14,4 +14,26 @@ public static class DifferentCombinationsExtension
             ? query.SelectMany(pair => new[] { (pair.e1, pair.e2), (pair.e2, pair.e1) })
             : query;
     }
+
+    public static int AddOrCreate<TKey>(this IDictionary<TKey, int> dict, TKey key, int valueToAdd, int defaultValue = 0)
+    {
+        if (!dict.ContainsKey(key))
+        {
+            dict.Add(key, defaultValue);
+        }
+
+        dict[key] += valueToAdd;
+        return dict[key];
+    }
+
+    public static long AddOrCreate<TKey>(this IDictionary<TKey, long> dict, TKey key, long valueToAdd, long defaultValue = 0)
+    {
+        if (!dict.ContainsKey(key))
+        {
+            dict.Add(key, defaultValue);
+        }
+
+        dict[key] += valueToAdd;
+        return dict[key];
+    }
 }
