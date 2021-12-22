@@ -6,17 +6,15 @@ class Player
     public int Points { get; set; }
 }
 
-class SimpleDiracDiceGame
+class SimpleDiracDiceGame : DiracDiceGame
 {
     private readonly IDice _dice;
-    private readonly int _maxPosition;
     private readonly int _winningPoints;
     private int _currentPlayer = 0;
 
-    public SimpleDiracDiceGame(IDice dice, int maxPosition, int winningPoints)
+    public SimpleDiracDiceGame(IDice dice, int maxPosition, int winningPoints) : base(maxPosition)
     {
         _dice = dice;
-        _maxPosition = maxPosition;
         _winningPoints = winningPoints;
     }
 
@@ -36,10 +34,10 @@ class SimpleDiracDiceGame
         {
             player = players[_currentPlayer];
 
-            var points = _dice.Throw() + _dice.Throw() + _dice.Throw();
-            player.Position += points;
-            player.Position %= _maxPosition;
-            player.Points += player.Position + 1;
+            var diceRoll = _dice.Throw() + _dice.Throw() + _dice.Throw();
+
+            (player.Position, player.Points) = MovePlayer(player.Position, player.Points, diceRoll);
+
             _currentPlayer++;
             _currentPlayer %= players.Length;
 
@@ -48,7 +46,7 @@ class SimpleDiracDiceGame
         return players
             .Select(p => new Player
             {
-                Position = p.Position == _maxPosition ? 1 : p.Position + 1,
+                Position = p.Position + 1,
                 Points = p.Points,
             })
             .ToArray();
