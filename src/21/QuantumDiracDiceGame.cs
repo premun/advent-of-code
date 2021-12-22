@@ -63,15 +63,7 @@ class QuantumDiracDiceGame : DiracDiceGame
                         winsOfFirstPlayer[position1, position2, points1, points2] = (
                             from roll1 in _diceRolls
                             from roll2 in _diceRolls
-                            select GetWins(
-                                position1,
-                                position2,
-                                points1,
-                                points2,
-                                winsOfFirstPlayer,
-                                roll1,
-                                roll2,
-                                firstPlayerStarts)
+                            select GetWins(position1, position2, points1, points2, winsOfFirstPlayer, roll1, roll2, firstPlayerStarts)
                         ).Sum()/* + GetWins(position1, position2, points1, points2, firstPlayerStarts)*/;
                     }
                 }
