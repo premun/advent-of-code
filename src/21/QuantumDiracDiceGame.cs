@@ -72,7 +72,7 @@ class QuantumDiracDiceGame : DiracDiceGame
                                 roll1,
                                 roll2,
                                 firstPlayerStarts)
-                        ).Sum();// + GetWins(position1, position2, points1, points2, firstPlayerStarts);
+                        ).Sum()/* + GetWins(position1, position2, points1, points2, firstPlayerStarts)*/;
                     }
                 }
             }
@@ -102,7 +102,7 @@ class QuantumDiracDiceGame : DiracDiceGame
             if (nextPoints2 >= _winningPoints)
             {
                 // If we can both win next round then whoever rolls first wins
-                return firstPlayerStarts ? rollCount : 0;
+                return firstPlayerStarts ? 1 : 0;
             }
             else
             {
