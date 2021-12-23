@@ -4,7 +4,7 @@ namespace _23;
 
 class AmphipodWorld
 {
-    private readonly Field[,] _map;
+    private readonly Field[][] _map;
     private readonly int _sizeY;
     private readonly int _sizeX;
 
@@ -13,10 +13,12 @@ class AmphipodWorld
         _sizeY = world.Length;
         _sizeX = world.Select(line => line.Length).Max();
 
-        _map = new Field[_sizeY, _sizeX];
+        _map = new Field[_sizeY][];
 
         for (int y = 0; y < _sizeY; y++)
         {
+            _map[y] = new Field[_sizeX];
+
             for (int x = 0; x < _sizeX; x++)
             {
                 char c = x >= world[y].Length ? ' ' : world[y][x];
@@ -45,7 +47,7 @@ class AmphipodWorld
                     case 'C':
                     case 'D':
                         var roomsToLeft = Enumerable.Range(0, x)
-                            .Count(i => (_map[y, x] is OccupyableField f) && f.IsOccupied);
+                            .Count(i => (_map[y][x] is OccupyableField f) && f.IsOccupied);
 
                         field = roomsToLeft switch
                         {
@@ -62,18 +64,63 @@ class AmphipodWorld
                         throw new Exception($"Cannot recognize field {c}");
                 }
 
-                _map[y, x] = field;
+                _map[y][x] = field;
             }
         }
     }
 
-    public Field Get(int Y, int X) => _map[Y, X];
+    public AmphipodWorld(Field[][] map)
+    {
+        _map = map;
+        _sizeY = map.GetLength(0);
+        _sizeX = map.GetLength(1);
+    }
 
-    public Field Get(Coor coordinate) => _map[coordinate.Y, coordinate.X];
+    public AmphipodWorld MoveAmphipod(Coor from, Coor to)
+    {
+        var newMap = new Field[_sizeY][];
+
+        for (int y = 0; y < _sizeY; y++)
+        {
+            newMap[y] = new Field[_sizeX];
+
+            for (int x = 0; x < _sizeX; x++)
+            {
+                if (y == from.Y && x == from.X)
+                {
+                    newMap[y][x] = _map[to.Y][to.X];
+                }
+                else if (y == to.Y && x == to.X)
+                {
+                    newMap[y][x] = _map[from.Y][from.X];
+                }
+                else
+                {
+                    newMap[y][x] = _map[y][x];
+                }
+            }
+        }
+
+        return new AmphipodWorld(newMap);
+    }
+
+    public bool IsFinished() => _map.SelectMany(row => row).All(field => field switch
+    {
+        RoomAField roomA => roomA.Occupant == 'A',
+        RoomBField roomB => roomB.Occupant == 'B',
+        RoomCField roomC => roomC.Occupant == 'C',
+        RoomDField roomD => roomD.Occupant == 'D',
+        OccupyableField room => room is RoomField || !room.IsOccupied,
+        _ => true,
+    });
+
+    public Field Get(int Y, int X) => _map[Y][X];
+
+    public Field Get(Coor coordinate) => _map[coordinate.Y][coordinate.X];
 
     public override string ToString() => new(
         Enumerable.Range(0, _sizeY).SelectMany(y =>
-        Enumerable.Range(0, _sizeX).Select(x => _map[y, x].ToChar()).Append('\r').Append('\n'))
+        Enumerable.Range(0, _sizeX).Select(x => _map[y][x].ToChar()).Append('\r').Append('\n'))
         .ToArray());
 
     public override int GetHashCode() => ToString().GetHashCode();
