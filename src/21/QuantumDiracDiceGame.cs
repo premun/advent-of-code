@@ -6,6 +6,7 @@ class QuantumDiracDiceGame : DiracDiceGame
 {
     private readonly int _maxPosition;
     private readonly int _winningPoints;
+    private readonly int _diceSides;
 
     // Map where keys are possible sums of 3 dice rolls and values counts of combinations that have that value
     private readonly ReadOnlyCollection<(int Value, int Count)> _diceRolls;
@@ -14,29 +15,8 @@ class QuantumDiracDiceGame : DiracDiceGame
     {
         _maxPosition = maxPosition;
         _winningPoints = winningPoints;
-
-        var sides = Enumerable.Range(1, diceSides);
-        var outcomes =
-            from a in sides
-            from b in sides
-            from c in sides
-            select (a + b + c);
-
-        var diceRolls = new Dictionary<int, int>();
-
-        foreach (var points in outcomes)
-        {
-            if (diceRolls.ContainsKey(points))
-            {
-                diceRolls[points]++;
-            }
-            else
-            {
-                diceRolls[points] = 1;
-            }
-        }
-
-        _diceRolls = diceRolls.Select(x => (Value: x.Key, Count: x.Value)).ToList().AsReadOnly();
+        _diceSides = diceSides;
+        _diceRolls = GeneratePossibleDiceRolls(diceSides);
     }
 
     public long RunGame(int player1Position, int player2Position, bool firstPlayerStarts)
@@ -64,9 +44,15 @@ class QuantumDiracDiceGame : DiracDiceGame
             }
         }
 
-        return firstPlayerStarts
-            ? winsOfFirstPlayer[player1Position - 1, player2Position - 1, 0, 0] / 27 // I HAVE NO IDEA WHY BUT FOR STARTING PLAYER I NEED THIS
-            : winsOfFirstPlayer[player1Position - 1, player2Position - 1, 0, 0];
+        var wins = winsOfFirstPlayer[player1Position - 1, player2Position - 1, 0, 0];
+
+        // I haven't figured out why but I get 27x higher values when player starts
+        if (firstPlayerStarts)
+        {
+            wins /= (int)Math.Pow(_diceSides, _diceSides);
+        }
+
+        return wins;
     }
 
     private long GetWins(
@@ -106,5 +92,31 @@ class QuantumDiracDiceGame : DiracDiceGame
         }
 
         return rollCount * winsOfFirstPlayer[nextPosition1, nextPosition2, nextPoints1, nextPoints2];
+    }
+
+    private static ReadOnlyCollection<(int Value, int Count)> GeneratePossibleDiceRolls(int diceSides)
+    {
+        var sides = Enumerable.Range(1, diceSides);
+        var outcomes =
+            from a in sides
+            from b in sides
+            from c in sides
+            select (a + b + c);
+
+        var diceRolls = new Dictionary<int, int>();
+
+        foreach (var points in outcomes)
+        {
+            if (diceRolls.ContainsKey(points))
+            {
+                diceRolls[points]++;
+            }
+            else
+            {
+                diceRolls[points] = 1;
+            }
+        }
+
+        return diceRolls.Select(x => (Value: x.Key, Count: x.Value)).ToList().AsReadOnly();
     }
 }
