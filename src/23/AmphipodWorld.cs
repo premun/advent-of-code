@@ -37,7 +37,7 @@ class AmphipodWorld
                         break;
 
                     case '.':
-                        field = Neighbourhs(y, x).Any(n => IsOccupied(world[n.Y][n.X]))
+                        field = Neighbourhs(y, x).Any(n => world[n.Y][n.X] >= 'A' && world[n.Y][n.X] <= 'D')
                             ? new RoomDoor()
                             : new HallwayField();
                         break;
@@ -46,15 +46,14 @@ class AmphipodWorld
                     case 'B':
                     case 'C':
                     case 'D':
-                        var roomsToLeft = Enumerable.Range(0, x)
-                            .Count(i => (_map[y][x] is OccupyableField f) && f.IsOccupied);
+                        var roomsToLeft = Enumerable.Range(0, x - 1).Count(i => _map[y][i] is RoomField f);
 
                         field = roomsToLeft switch
                         {
-                            0 => new RoomAField(c),
-                            1 => new RoomBField(c),
-                            2 => new RoomCField(c),
-                            3 => new RoomDField(c),
+                            0 => new RoomField('A', c),
+                            1 => new RoomField('B', c),
+                            2 => new RoomField('C', c),
+                            3 => new RoomField('D', c),
                             _ => throw new Exception("Too many rooms detected"),
                         };
 
@@ -72,8 +71,8 @@ class AmphipodWorld
     public AmphipodWorld(Field[][] map)
     {
         _map = map;
-        _sizeY = map.GetLength(0);
-        _sizeX = map.GetLength(1);
+        _sizeY = map.Length;
+        _sizeX = map[0].Length;
     }
 
     public AmphipodWorld MoveAmphipod(Coor from, Coor to)
@@ -88,11 +87,19 @@ class AmphipodWorld
             {
                 if (y == from.Y && x == from.X)
                 {
-                    newMap[y][x] = _map[to.Y][to.X];
+                    var fromField = (OccupyableField)_map[y][x];
+                    newMap[y][x] = fromField with
+                    {
+                        Occupant = null
+                    };
                 }
                 else if (y == to.Y && x == to.X)
                 {
-                    newMap[y][x] = _map[from.Y][from.X];
+                    var toField = (OccupyableField)_map[y][x];
+                    newMap[y][x] = toField with
+                    {
+                        Occupant = ((OccupyableField)_map[from.Y][from.X]).Occupant
+                    };
                 }
                 else
                 {
@@ -104,15 +111,97 @@ class AmphipodWorld
         return new AmphipodWorld(newMap);
     }
 
-    public bool IsFinished() => _map.SelectMany(row => row).All(field => field switch
+    public bool IsFinished() => AllFields.All(f => f.Field switch
     {
-        RoomAField roomA => roomA.Occupant == 'A',
-        RoomBField roomB => roomB.Occupant == 'B',
-        RoomCField roomC => roomC.Occupant == 'C',
-        RoomDField roomD => roomD.Occupant == 'D',
-        OccupyableField room => room is RoomField || !room.IsOccupied,
+        RoomField room => room.Occupant == room.Name,
         _ => true,
     });
+
+    public IEnumerable<(AmphipodWorld World, int EnergyCost)> GetPossibleMoves()
+    {
+        var amphipods = AllFields
+            .Where(field => field.Field is OccupyableField f && f.IsOccupied)
+            .Select(x => (Field: (OccupyableField)x.Field, x.Coor));
+            //.OrderBy(_ => Guid.NewGuid());
+
+        var result = new List<(AmphipodWorld World, int EnergyCost)>();
+
+        foreach (var amphipod in amphipods)
+        {
+            var amphipodName = amphipod.Field.Occupant;
+
+            // Starting in my room
+            if (amphipod.Field is RoomField sourceRoom && sourceRoom.OccupantIsHome)
+            {
+                // My room is filled with the right type of animal, let's not leave it
+                if (Neighbourhs(amphipod.Coor).All(r => Get(r) is not RoomField rf || rf.OccupantIsHome))
+                {
+                    continue;
+                }
+            }
+
+            foreach (var coor in GetReachableFields(amphipod.Coor))
+            {
+                var targetField = Get(coor);
+
+                if (targetField is RoomDoor)
+                {
+                    // Cannot move right outside of a room
+                    continue;
+                }
+
+                if (amphipod.Field is HallwayField)
+                {
+                    if (targetField is HallwayField)
+                    {
+                        // Can't move from hallway to hallway
+                        continue;
+                    }
+
+                    if (targetField is RoomField rf && rf.Name != amphipodName)
+                    {
+                        // Can't go to other's room
+                        continue;
+                    }
+                }
+
+                if (targetField is RoomField targetRoom)
+                {
+                    if (targetRoom.Name != amphipodName)
+                    {
+                        // Can only move to his own room
+                        continue;
+                    }
+
+                    if (amphipod.Field is RoomField sourcRoom && targetRoom.Name == sourcRoom.Name)
+                    {
+                        // No sense in moving around my room
+                        continue;
+                    }
+
+                    if (_map[coor.Y + 1][coor.X] is RoomField fieldBelow && !fieldBelow.IsOccupied)
+                    {
+                        // No sense to block the room
+                        continue;
+                    }
+                }
+
+                var cost = Math.Abs(coor.X - amphipod.Coor.X) + Math.Abs(coor.Y - amphipod.Coor.Y);
+                cost *= amphipodName switch
+                {
+                    'A' => 1,
+                    'B' => 10,
+                    'C' => 100,
+                    'D' => 1000,
+                    _ => throw new Exception($"Unrecognized amphipod '{amphipodName}'"),
+                };
+
+                result.Add((MoveAmphipod(amphipod.Coor, coor), cost));
+            }
+        }
+
+        return result;
+    }
 
     public Field Get(int Y, int X) => _map[Y][X];
 
@@ -140,18 +229,37 @@ class AmphipodWorld
         return false;
     }
 
-    private IEnumerable<Coor> Neighbourhs(int y, int x)
+    private IEnumerable<Coor> Neighbourhs(int y, int x) => Neighbourhs(new Coor(y, x));
+
+    private IEnumerable<Coor> Neighbourhs(Coor coor) => new[]
     {
-        var coor = new Coor(y, x);
+        coor + new Coor(0, 1),
+        coor + new Coor(1, 0),
+        coor + new Coor(-1, 0),
+        coor + new Coor(0, -1),
+    }.Where(n => n.Y < _sizeY && n.X < _sizeX && n.Y >= 0 && n.X >= 0);
 
-        return new[]
+    private IEnumerable<(Field Field, Coor Coor)> AllFields
+        => _map.SelectMany((row, y) => row.Select((field, x) => (field, new Coor(y, x))));
+
+    private List<Coor> GetReachableFields(Coor from)
+    {
+        var visited = new List<Coor>();
+
+        void GetReachableFieldsHelper(Coor f)
         {
-            coor + new Coor(0, 1),
-            coor + new Coor(1, 0),
-            coor + new Coor(-1, 0),
-            coor + new Coor(0, -1),
-        }.Where(n => n.Y < _sizeY && n.X < _sizeX && n.Y >= 0 && n.X >= 0);
-    }
+            var newFreeFieldsAround = Neighbourhs(f)
+                .Where(n => Get(n) is OccupyableField field && !field.IsOccupied && !visited.Contains(n));
 
-    private static bool IsOccupied(char c) => c >= 'A' && c <= 'D';
+            foreach (var field in newFreeFieldsAround)
+            {
+                visited.Add(field);
+                GetReachableFieldsHelper(field);
+            }
+        }
+
+        GetReachableFieldsHelper(from);
+
+        return visited;
+    }
 }
