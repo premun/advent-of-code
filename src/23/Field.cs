@@ -17,28 +17,36 @@ record EmptyField() : Field
     public override char ToChar() => ' ';
 }
 
-record OccupyableField : Field
+record OccupyableField(char? Occupant) : Field
 {
-    public OccupyableField(char? occupant)
-    {
-        Occupant = occupant;
-    }
-
-    public char? Occupant { get; }
-
     [MemberNotNullWhen(true, "Occupant")]
     public bool IsOccupied => Occupant.HasValue;
 
     public override char ToChar() => IsOccupied ? Occupant.Value : '.';
 }
 
-record HallwayField(char? occupant = null) : OccupyableField(occupant);
+record HallwayField : OccupyableField
+{
+    public HallwayField(char? occupant = null) : base(occupant)
+    {
+    }
+}
 
-record RoomDoor(char? occupant = null) : OccupyableField(occupant);
+record RoomDoor : OccupyableField
+{
+    public RoomDoor(char? occupant = null) : base(occupant)
+    {
+    }
+}
 
-abstract record RoomField(char? occupant = null) : OccupyableField(occupant);
+record RoomField : OccupyableField
+{
+    public RoomField(char name, char? occupant = null) : base(occupant)
+    {
+        Name = name;
+    }
 
-record RoomAField(char? occupant = null) : RoomField(occupant);
-record RoomBField(char? occupant = null) : RoomField(occupant);
-record RoomCField(char? occupant = null) : RoomField(occupant);
-record RoomDField(char? occupant = null) : RoomField(occupant);
+    public char Name { get; }
+
+    public bool OccupantIsHome => Name == Occupant;
+}
