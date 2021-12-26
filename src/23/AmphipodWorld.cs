@@ -8,6 +8,15 @@ class AmphipodWorld
     private readonly int _sizeY;
     private readonly int _sizeX;
 
+    private readonly RoomField[] _rooms;
+
+    public AmphipodWorld(string world) : this(world
+        .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
+        .Select(line => line.Select(field => field).ToArray())
+        .ToArray())
+    {
+    }
+
     public AmphipodWorld(char[][] world)
     {
         _sizeY = world.Length;
@@ -66,6 +75,8 @@ class AmphipodWorld
                 _map[y][x] = field;
             }
         }
+
+        _rooms = AllFields.Where(f => f.Field is RoomField).Select(f => Get(f.Coor)).Cast<RoomField>().ToArray();
     }
 
     public AmphipodWorld(Field[][] map)
@@ -73,6 +84,8 @@ class AmphipodWorld
         _map = map;
         _sizeY = map.Length;
         _sizeX = map[0].Length;
+
+        _rooms = AllFields.Where(f => f.Field is RoomField).Select(f => Get(f.Coor)).Cast<RoomField>().ToArray();
     }
 
     public AmphipodWorld MoveAmphipod(Coor from, Coor to)
@@ -111,18 +124,13 @@ class AmphipodWorld
         return new AmphipodWorld(newMap);
     }
 
-    public bool IsFinished() => AllFields.All(f => f.Field switch
-    {
-        RoomField room => room.Occupant == room.Name,
-        _ => true,
-    });
+    public bool IsFinished() => _rooms.All(room => room.OccupantIsHome);
 
     public IEnumerable<(AmphipodWorld World, int EnergyCost)> GetPossibleMoves()
     {
         var amphipods = AllFields
             .Where(field => field.Field is OccupyableField f && f.IsOccupied)
             .Select(x => (Field: (OccupyableField)x.Field, x.Coor));
-            //.OrderBy(_ => Guid.NewGuid());
 
         var result = new List<(AmphipodWorld World, int EnergyCost)>();
 
@@ -134,15 +142,15 @@ class AmphipodWorld
             if (amphipod.Field is RoomField sourceRoom && sourceRoom.OccupantIsHome)
             {
                 // My room is filled with the right type of animal, let's not leave it
-                if (Neighbourhs(amphipod.Coor).All(r => Get(r) is not RoomField rf || rf.OccupantIsHome))
+                if (_rooms.Any(r => r.Name == sourceRoom.Name && r.IsOccupied && !r.OccupantIsHome))
                 {
                     continue;
                 }
             }
 
-            foreach (var coor in GetReachableFields(amphipod.Coor))
+            foreach (var destination in GetReachableFields(amphipod.Coor))
             {
-                var targetField = Get(coor);
+                var targetField = Get(destination.Coor);
 
                 if (targetField is RoomDoor)
                 {
@@ -179,15 +187,14 @@ class AmphipodWorld
                         continue;
                     }
 
-                    if (_map[coor.Y + 1][coor.X] is RoomField fieldBelow && !fieldBelow.IsOccupied)
+                    if (_map[destination.Coor.Y + 1][destination.Coor.X] is RoomField fieldBelow && !fieldBelow.IsOccupied)
                     {
                         // No sense to block the room
                         continue;
                     }
                 }
 
-                var cost = Math.Abs(coor.X - amphipod.Coor.X) + Math.Abs(coor.Y - amphipod.Coor.Y);
-                cost *= amphipodName switch
+                var cost = destination.Distance * amphipodName switch
                 {
                     'A' => 1,
                     'B' => 10,
@@ -196,7 +203,7 @@ class AmphipodWorld
                     _ => throw new Exception($"Unrecognized amphipod '{amphipodName}'"),
                 };
 
-                result.Add((MoveAmphipod(amphipod.Coor, coor), cost));
+                result.Add((MoveAmphipod(amphipod.Coor, destination.Coor), cost));
             }
         }
 
@@ -242,23 +249,25 @@ class AmphipodWorld
     private IEnumerable<(Field Field, Coor Coor)> AllFields
         => _map.SelectMany((row, y) => row.Select((field, x) => (field, new Coor(y, x))));
 
-    private List<Coor> GetReachableFields(Coor from)
+    // Technically this is wrong - we don't calculate the distance correctly
+    // We instead rely on the corridor being 1 char wide and so that DFS == BFS in this case
+    private List<(Coor Coor, int Distance)> GetReachableFields(Coor from)
     {
-        var visited = new List<Coor>();
+        var visited = new List<(Coor, int)>();
 
-        void GetReachableFieldsHelper(Coor f)
+        void GetReachableFieldsHelper(Coor f, int distance)
         {
             var newFreeFieldsAround = Neighbourhs(f)
-                .Where(n => Get(n) is OccupyableField field && !field.IsOccupied && !visited.Contains(n));
+                .Where(n => Get(n) is OccupyableField field && !field.IsOccupied && !visited.Any(m => m.Item1 == n));
 
             foreach (var field in newFreeFieldsAround)
             {
-                visited.Add(field);
-                GetReachableFieldsHelper(field);
+                visited.Add((field, distance));
+                GetReachableFieldsHelper(field, distance + 1);
             }
         }
 
-        GetReachableFieldsHelper(from);
+        GetReachableFieldsHelper(from, 1);
 
         return visited;
     }
