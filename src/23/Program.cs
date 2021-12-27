@@ -1,17 +1,10 @@
 ﻿using _23;
-using Common;
 
-var world = new AmphipodWorld(Resources.GetResourceFile("input.txt"));
-
-var finishedWorld = new AmphipodWorld(
-    "#############" + Environment.NewLine +
-    "#...........#" + Environment.NewLine +
-    "###A#B#C#D###" + Environment.NewLine +
-    "  #A#B#C#D#" + Environment.NewLine +
-    "  #########");
-
-static int Part1(AmphipodWorld startWorld, AmphipodWorld finishedWorld)
+static int FindLowestEnergyCost(AmphipodWorld startWorld, AmphipodWorld finishedWorld)
 {
+    Console.WriteLine("Searching from");
+    Console.WriteLine(startWorld);
+
     // Dijkstra
     var queue = new PriorityQueue<AmphipodWorld, int>();
     queue.Enqueue(startWorld, 0);
@@ -21,18 +14,17 @@ static int Part1(AmphipodWorld startWorld, AmphipodWorld finishedWorld)
         [startWorld.GetHashCode()] = 0
     };
 
-    var prev = new Dictionary<int, (AmphipodWorld, int)>();
+    var previousWorld = new Dictionary<int, (AmphipodWorld, int)>();
 
     while (queue.Count > 0)
     {
         var current = queue.Dequeue();
-        var hash = current.GetHashCode();
-        var currentEnergy = lowestEnergies[hash];
+        var currentEnergy = lowestEnergies[current.GetHashCode()];
 
         foreach (var move in current.GetPossibleMoves())
         {
-            var hash2 = move.World.GetHashCode();
-            if (!lowestEnergies.TryGetValue(hash2, out var neighbourEnergy))
+            var hash = move.World.GetHashCode();
+            if (!lowestEnergies.TryGetValue(hash, out var neighbourEnergy))
             {
                 neighbourEnergy = int.MaxValue;
             }
@@ -40,23 +32,30 @@ static int Part1(AmphipodWorld startWorld, AmphipodWorld finishedWorld)
             var newEnergy = currentEnergy + move.EnergyCost;
             if (newEnergy < neighbourEnergy)
             {
-                lowestEnergies[hash2] = newEnergy;
+                lowestEnergies[hash] = newEnergy;
                 queue.Enqueue(move.World, newEnergy);
-                prev[hash2] = (current, currentEnergy);
+                previousWorld[hash] = (current, currentEnergy);
             }
         }
     }
 
-    var start = startWorld.GetHashCode();
     var currentHash = finishedWorld.GetHashCode();
-    var moves = new List<(AmphipodWorld, int)>();
-    while (currentHash != start)
+    if (!lowestEnergies.TryGetValue(currentHash, out var result))
     {
-        moves.Add(prev[currentHash]);
-        currentHash = prev[currentHash].Item1.GetHashCode();
+        Console.WriteLine("Failed to find the moves to reach the desired state!");
+        return -1;
     }
 
-    // Print the sequence
+    var start = startWorld.GetHashCode();
+    var moves = new List<(AmphipodWorld, int)>();
+
+    while (currentHash != start)
+    {
+        moves.Add(previousWorld[currentHash]);
+        currentHash = previousWorld[currentHash].Item1.GetHashCode();
+    }
+
+    // Print the winning sequence
     int i = 1;
     foreach (var w in moves.Reverse<(AmphipodWorld, int)>())
     {
@@ -64,10 +63,53 @@ static int Part1(AmphipodWorld startWorld, AmphipodWorld finishedWorld)
         Console.WriteLine(w.Item1);
     }
 
-    Console.WriteLine(lowestEnergies[finishedWorld.GetHashCode()]);
+    Console.WriteLine(result);
     Console.WriteLine(finishedWorld);
 
-    return lowestEnergies[finishedWorld.GetHashCode()];
+    return result;
 }
 
-Console.WriteLine($"Part 1: {Part1(world, finishedWorld)}");
+var startWorld = new AmphipodWorld(new[]
+{
+    "#############",
+    "#...........#",
+    "###B#A#B#C###",
+    "  #C#D#D#A#",
+    "  #########"
+});
+
+var endWorld = new AmphipodWorld(new[]
+{
+    "#############",
+    "#...........#",
+    "###A#B#C#D###",
+    "  #A#B#C#D#",
+    "  #########"
+});
+
+Console.WriteLine($"Part 1: " + FindLowestEnergyCost(startWorld, endWorld));
+Console.WriteLine();
+
+startWorld = new AmphipodWorld(new[]
+{
+    "#############",
+    "#...........#",
+    "###B#A#B#C###",
+    "  #D#C#B#A#",
+    "  #D#B#A#C#",
+    "  #C#D#D#A#",
+    "  #########",
+});
+
+endWorld = new AmphipodWorld(new[]
+{
+    "#############",
+    "#...........#",
+    "###A#B#C#D###",
+    "  #A#B#C#D#",
+    "  #A#B#C#D#",
+    "  #A#B#C#D#",
+    "  #########"
+});
+
+Console.WriteLine($"Part 2: " + FindLowestEnergyCost(startWorld, endWorld));
