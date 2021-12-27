@@ -8,12 +8,9 @@ class AmphipodWorld
     private readonly int _sizeY;
     private readonly int _sizeX;
 
-    private readonly RoomField[] _rooms;
+    private readonly Coor[] _rooms;
 
-    public AmphipodWorld(string world) : this(world
-        .Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries)
-        .Select(line => line.Select(field => field).ToArray())
-        .ToArray())
+    public AmphipodWorld(string[] world) : this(world.Select(line => line.Select(field => field).ToArray()).ToArray())
     {
     }
 
@@ -76,16 +73,15 @@ class AmphipodWorld
             }
         }
 
-        _rooms = AllFields.Where(f => f.Field is RoomField).Select(f => Get(f.Coor)).Cast<RoomField>().ToArray();
+        _rooms = AllFields.Where(f => f.Field is RoomField).Select(f => f.Coor).ToArray();
     }
 
-    public AmphipodWorld(Field[][] map)
+    public AmphipodWorld(Field[][] map, Coor[] rooms)
     {
         _map = map;
         _sizeY = map.Length;
         _sizeX = map[0].Length;
-
-        _rooms = AllFields.Where(f => f.Field is RoomField).Select(f => Get(f.Coor)).Cast<RoomField>().ToArray();
+        _rooms = rooms;
     }
 
     public AmphipodWorld MoveAmphipod(Coor from, Coor to)
@@ -121,16 +117,17 @@ class AmphipodWorld
             }
         }
 
-        return new AmphipodWorld(newMap);
+        return new AmphipodWorld(newMap, _rooms);
     }
 
-    public bool IsFinished() => _rooms.All(room => room.OccupantIsHome);
+    public bool IsFinished() => _rooms.All(coor => ((RoomField)Get(coor)).OccupantIsHome);
 
     public IEnumerable<(AmphipodWorld World, int EnergyCost)> GetPossibleMoves()
     {
         var amphipods = AllFields
             .Where(field => field.Field is OccupyableField f && f.IsOccupied)
-            .Select(x => (Field: (OccupyableField)x.Field, x.Coor));
+            .Select(x => (Field: (OccupyableField)x.Field, x.Coor))
+            /*.OrderBy(x => 'D' - x.Field.Occupant!.Value)*/;
 
         var result = new List<(AmphipodWorld World, int EnergyCost)>();
 
@@ -138,12 +135,16 @@ class AmphipodWorld
         {
             var amphipodName = amphipod.Field.Occupant;
 
-            // Starting in my room
+            // Starting in my room - does it make sense to move out?
             if (amphipod.Field is RoomField sourceRoom && sourceRoom.OccupantIsHome)
             {
-                // My room is filled with the right type of animal, let's not leave it
-                if (_rooms.Any(r => r.Name == sourceRoom.Name && r.IsOccupied && !r.OccupantIsHome))
+                bool blockingSomeone = Enumerable.Range(amphipod.Coor.Y, _sizeY - amphipod.Coor.Y - 1)
+                    .Select(y => Get(new Coor(Y: y, X: amphipod.Coor.X)))
+                    .Any(f => f is RoomField roomField && !roomField.OccupantIsHome);
+
+                if (!blockingSomeone)
                 {
+                    // All amphipods below (including) me are home
                     continue;
                 }
             }
@@ -190,6 +191,12 @@ class AmphipodWorld
                     if (_map[destination.Coor.Y + 1][destination.Coor.X] is RoomField fieldBelow && !fieldBelow.IsOccupied)
                     {
                         // No sense to block the room
+                        continue;
+                    }
+
+                    if (_rooms.Select(r => (RoomField)Get(r)).Any(r => r.Name == targetRoom.Name && r.IsOccupied && !r.OccupantIsHome))
+                    {
+                        // Amphipods will never move into a room which contains no amphipods does not contain foreigners
                         continue;
                     }
                 }
