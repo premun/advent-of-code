@@ -20,7 +20,7 @@ var cuboids = Resources.GetResourceFileLines("input.txt")
     ))
     .ToList();
 
-static long GetNumberOfDistinctPoints(IList<Cuboid> cuboids)
+/*static long GetNumberOfDistinctPoints(IList<Cuboid> cuboids)
 {
     if (cuboids.Count == 0)
     {
@@ -50,76 +50,91 @@ static long GetNumberOfDistinctPoints(IList<Cuboid> cuboids)
     }
 
     return cuboids.Select(c => c.Volume).Sum() - GetNumberOfDistinctPoints(intersections);
-}
-
-var buffer = 
-
-for (int i = 0; i < cuboids.Count; i++)
-{
-    var current = cuboids[i];
-
-    
-}
-
-
-/*int count = cuboids.Count;
-long onCount = 0;
-for (int i = 0; i < count; i++)
-{
-    var current = cuboids[i];
-
-    Console.WriteLine($"{current} ({current.Cube.Volume}):");
-
-    var intersections = new List<Cuboid>();
-
-    int prevCount = i;
-    for (int j = 0; j < prevCount; j++)
-    {
-        var prev = cuboids[j];
-
-        if (prev.Cube.TryIntersect(current.Cube, out var intersection))
-        {
-            intersections.Add(intersection);
-
-            // cubes.Insert(i, (current.IsOn, intersection, current.Depth + prev.Depth));
-
-            Console.WriteLine($"   {intersection}  {intersection.Volume}");
-
-            //i++;
-
-            if (prev.IsOn)
-            {
-                onCount -= intersection.Volume;
-            }
-        }
-
-        Console.WriteLine($"   {onCount}");
-    }
 }*/
 
-var points = new Dictionary<(int, int, int), bool>();
+var allCuboids = new List<(bool IsOn, Cuboid Cube)>();
+
+foreach (var cuboid in cuboids)
+{
+    var count = allCuboids.Count;
+    for (var i = 0; i < count; i++)
+    {
+        (bool IsOn, Cuboid Cube) otherCuboid = allCuboids[i];
+        if (cuboid.Cube.TryIntersect(otherCuboid.Cube, out Cuboid? intersection))
+        {
+            allCuboids.Add((!otherCuboid.IsOn, intersection));
+        }
+    }
+
+    if (cuboid.IsOn)
+    {
+        allCuboids.Add(cuboid);
+    }
+}
+
+ulong initializationVolume = 0;
+ulong volume = 0;
+
+var limitation = new Cuboid(new Dim(-50, 50), new Dim(-50, 50), new Dim(-50, 50));
+
+foreach (var cuboid in allCuboids)
+{
+    if (cuboid.Cube.TryIntersect(limitation, out Cuboid? intersection))
+    {
+        if (cuboid.IsOn)
+        {
+            initializationVolume += intersection.Volume;
+        }
+        else
+        {
+            initializationVolume -= intersection.Volume;
+        }
+    }
+
+    if (cuboid.IsOn)
+    {
+        volume += cuboid.Cube.Volume;
+    }
+    else
+    {
+        volume -= cuboid.Cube.Volume;
+    }
+}
+
+Console.WriteLine($"Part 1: {initializationVolume}");
+Console.WriteLine($"Part 2: {volume}");
+
+/*var points = new bool[101, 101, 101];
+volume = 0;
 
 foreach (var c in cuboids)
 {
     Console.WriteLine($"{c.Cube} ({c.Cube.Volume})");
 
-    var coors =
-        from x in c.Cube.X.Points
-        from y in c.Cube.Y.Points
-        from z in c.Cube.Z.Points
-        select (x, y, z);
-
-    foreach (var coor in coors)
+    for (int x = Math.Max(c.Cube.X.Min, -50); x <= Math.Min(c.Cube.X.Max, 50); x++)
     {
-        if (c.IsOn)
+        for (int y = Math.Max(c.Cube.Y.Min, -50); y <= Math.Min(c.Cube.Y.Max, 50); y++)
         {
-            points[coor] = true;
-        }
-        else if (points.ContainsKey(coor))
-        {
-            points.Remove(coor);
+            for (int z = Math.Max(c.Cube.Z.Min, -50); z <= Math.Min(c.Cube.Z.Max, 50); z++)
+            {
+                var prev = points[x + 50, y + 50, z + 50];
+
+                if (prev != c.IsOn)
+                {
+                    if (prev)
+                    {
+                        volume--;
+                    }
+                    else
+                    {
+                        volume++;
+                    }
+
+                    points[x + 50, y + 50, z + 50] = c.IsOn;
+                }
+            }
         }
     }
 }
 
-Console.WriteLine($"Part 1: {points.Count(p => p.Value)}");
+Console.WriteLine($"Part 1: {volume}");*/
