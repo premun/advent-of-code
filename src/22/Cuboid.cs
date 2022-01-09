@@ -13,7 +13,7 @@ record Dim(int Min, int Max)
 
 record Cuboid(Dim X, Dim Y, Dim Z)
 {
-    public long Volume { get; } = X.Length * Y.Length * Z.Length;
+    public ulong Volume { get; } = (ulong)X.Length * (ulong)Y.Length * (ulong)Z.Length;
 
     public bool TryIntersect(Cuboid other, [NotNullWhen(true)] out Cuboid? intersection)
     {
