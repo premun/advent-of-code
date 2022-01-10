@@ -1,13 +1,13 @@
-﻿static long MysteriousOperation(long input, long z, int first, int second)
+﻿static long MysteriousOperation(int input, long z, int first, int second)
 {
-    long x = (z % 26) + first;
+    long x = z % 26;
 
     if (first < 0)
     {
         z /= 26;
     }
 
-    if (x != input)
+    if (x != input - first)
     {
         z *= 26;
         z += input + second;
@@ -16,40 +16,7 @@
     return z;
 }
 
-static bool Monad(string input)
-{
-    if (input.Contains('0'))
-    {
-        return false;
-    }
-
-    var position = 0;
-    long GetNext()
-    {
-        return input[position++] - '0';
-    }
-
-    long z = 0;
-
-    z = MysteriousOperation(GetNext(), z, 15, 13);
-    z = MysteriousOperation(GetNext(), z, 10, 16);
-    z = MysteriousOperation(GetNext(), z, 12, 2);
-    z = MysteriousOperation(GetNext(), z, 10, 8);
-    z = MysteriousOperation(GetNext(), z, 14, 11);
-    z = MysteriousOperation(GetNext(), z, -11, 6);
-    z = MysteriousOperation(GetNext(), z, 10, 12);
-    z = MysteriousOperation(GetNext(), z, -16, 2);
-    z = MysteriousOperation(GetNext(), z, -9, 2);
-    z = MysteriousOperation(GetNext(), z, 11, 15);
-    z = MysteriousOperation(GetNext(), z, -8, 1);
-    z = MysteriousOperation(GetNext(), z, -8, 10);
-    z = MysteriousOperation(GetNext(), z, -10, 14);
-    z = MysteriousOperation(GetNext(), z, -9, 10);
-
-    return z == 0;
-}
-
-var parameters = new[]
+var monadParameters = new[]
 {
     (15, 13),
     (10, 16),
@@ -67,6 +34,64 @@ var parameters = new[]
     (-9, 10),
 };
 
+static bool Monad(string input, (int, int)[] parameters)
+{
+    if (input.Contains('0'))
+    {
+        return false;
+    }
+
+    var position = 0;
+    int GetNext()
+    {
+        return input[position++] - '0';
+    }
+
+    long z = 0;
+
+    for (int i = 0; i < parameters.Length; ++i)
+    {
+        var (p1, p2) = parameters[i];
+        z = MysteriousOperation(GetNext(), z, p1, p2);
+    }
+
+    return z == 0;
+}
+
+(long lowest, long highest) = (long.MaxValue, long.MinValue);
+
+/*Parallel.For(11111111111111, 99999999999999, i =>
+{
+    var s = i.ToString();
+    if (Monad(s, monadParameters))
+    {
+        Console.WriteLine(s);
+        //(lowest, highest) = (Math.Min(i, lowest), Math.Max(i, highest));
+    }
+});*/
+
+
+// 43751151418198
+//Console.WriteLine(lowest);
+//Console.WriteLine(highest);
+
+for (long i = 99999999999999; i >= 11111111111111; i--)
+{
+    var s = i.ToString();
+    if (i % 1000000000000 == 0)
+    {
+        Console.WriteLine(s);
+    }
+
+    if (Monad(s, monadParameters))
+    {
+        Console.WriteLine(s);
+    }
+}
+
+
+Console.ReadLine();
+
 /*
 
 Last operation needs these inputs (input digit, current value of z):
@@ -82,7 +107,7 @@ Last operation needs these inputs (input digit, current value of z):
 
 */
 
-static List<(int, int)> FindPossibleInputs(int first, int second, int minZ, int maxZ, long? target)
+/*static List<(int, int)> FindPossibleInputs(int first, int second, int minZ, int maxZ, long? target)
 {
     var result = new List<(int, int)>();
     for (int inputDigit = 9; inputDigit >= 1; inputDigit--)
@@ -92,7 +117,7 @@ static List<(int, int)> FindPossibleInputs(int first, int second, int minZ, int 
             if (!target.HasValue || MysteriousOperation(inputDigit, z, first, second) == target)
             {
                 result.Add((inputDigit, z));
-                //Console.WriteLine($"    {inputDigit}, {z}");
+                Console.WriteLine($"    {inputDigit}, {z}");
             }
         }
     }
@@ -100,6 +125,8 @@ static List<(int, int)> FindPossibleInputs(int first, int second, int minZ, int 
     return result;
 }
 
+
+/*
 static long FindLargestNumberForward(long z, IEnumerable<(int, int)> parameters, long acc)
 {
     if (!parameters.Any())
@@ -144,18 +171,18 @@ var (first, second) = parameters.First();
 
 //    //}
 //}
+*/
+/*var results = new List<(int, int)>[14];
+var range = 10000;
 
-var results = new List<(int, int)>[14];
-var range = 100;
-
-for (int i = parameters.Length - 1; i >= 0; i--)
+for (int i = monadParameters.Length - 1; i >= 0; i--)
 {
     results[i] = new List<(int, int)>(range);
 
-    Console.WriteLine($"Doing {parameters[i]}");
+    Console.WriteLine($"Doing {monadParameters[i]}");
 
     IEnumerable<int> possibleResults;
-    if (i == parameters.Length - 1)
+    if (i == monadParameters.Length - 1)
     {
         // Last operation needs to result in 0
         possibleResults = new[] { 0 };
@@ -173,11 +200,11 @@ for (int i = parameters.Length - 1; i >= 0; i--)
         {
             if (i == 0)
             {
-                results[i].AddRange(FindPossibleInputs(parameters[i].Item1, parameters[i].Item2, 0, 0, possibleResult));
+                results[i].AddRange(FindPossibleInputs(monadParameters[i].Item1, monadParameters[i].Item2, 0, 0, possibleResult));
             }
             else
             {
-                results[i].AddRange(FindPossibleInputs(parameters[i].Item1, parameters[i].Item2, 0 - r / 2, r / 2, possibleResult));
+                results[i].AddRange(FindPossibleInputs(monadParameters[i].Item1, monadParameters[i].Item2, 0 - r / 2, r / 2, possibleResult));
             }
         }
 
@@ -190,10 +217,33 @@ for (int i = parameters.Length - 1; i >= 0; i--)
     Console.WriteLine($"  has {results[i].Count}");
 }
 
-for (int i = 0; i < results.Length; i++)
+static long? FindLargestNumberForward2(long z, (int, int)[] parameters, int index, long acc)
 {
+    if (index == parameters.Length)
+    {
+        return z == 0 ? acc : null;
+    }
 
+    // Console.Write($"\r{acc}             ");
+
+    // We first find possible different values for every digit (1..9)
+    // Then we choose the largest number for this value
+    // For example all digits could end up producing the same result => we only take 9
+    var param1 = parameters[index].Item1;
+    var param2 = parameters[index].Item2;
+    var possibleValues = Enumerable.Range(1, 9)
+        .Select(i => (i, MysteriousOperation(i, z, param1, param2)))
+        .ToLookup(static pair => pair.Item2, static pair => pair.Item1)
+        .Select(static group => (Z: group.Key, Digit: group.Max()))
+        .OrderByDescending(p => p.Digit);
+
+    return possibleValues.Select(p => FindLargestNumberForward2(p.Z, parameters, index + 1, acc * 10 + p.Digit)).FirstOrDefault(r => r is not null);
 }
+
+Console.WriteLine("Starting");
+
+Console.WriteLine(FindLargestNumberForward2(0, monadParameters, 0, 0));
+
 
 /*
 static long FindLargestNumberBacktrack(long targetResult, IEnumerable<(int, int)> parameters, IEnumerable<char> acc)
