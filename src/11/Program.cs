@@ -1,8 +1,6 @@
 ﻿using Common;
 
-var map = Resources.GetResourceFileLines("input.txt")
-    .Select(line => line.Select(n => n - '0').ToArray())
-    .ToArray();
+var map = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray(c => c - '0');
 
 static int Step(int[][] map)
 {

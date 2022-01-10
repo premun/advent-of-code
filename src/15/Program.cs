@@ -1,9 +1,7 @@
 ﻿using _15;
 using Common;
 
-var map = Resources.GetResourceFileLines("input.txt")
-    .Select(line => line.Select(c => c - '0').ToArray())
-    .ToArray();
+var map = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray(c => c - '0');
 
 static int[][] Resize(int[][] map, int factor)
 {
