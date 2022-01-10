@@ -1,4 +1,4 @@
-﻿namespace Common;
+﻿namespace AdventOfCode.Common;
 
 public record Coor(int Y, int X)
 {

@@ -1,4 +1,4 @@
-﻿namespace Common;
+﻿namespace AdventOfCode.Common;
 
 public static class DifferentCombinationsExtension
 {
