@@ -1,9 +1,7 @@
 ﻿using _09;
 using Common;
 
-var heatMap = Resources.GetResourceFileLines("input.txt")
-    .Select(line => line.Select(n => n - '0').ToArray())
-    .ToArray();
+var heatMap = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray(c => c - '0');
 
 static long Part1(int[][] heatMap)
 {

@@ -1,8 +1,6 @@
 ﻿using Common;
 
-char[][] seafloor = Resources.GetResourceFileLines("input.txt")
-    .Select(line => line.Select(c => c).ToArray())
-    .ToArray();
+char[][] seafloor = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray();
 
 int width = seafloor[0].Length;
 int height = seafloor.Length;
