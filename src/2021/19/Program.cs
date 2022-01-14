@@ -68,57 +68,55 @@ static List<(int, int)> GetMatchingBeacons(Scanner group1, Scanner group2)
     return BipartityMatcher.FindMaxBipartity(graph).ToList();
 }
 
-// Finds two scanners with at least 12 matching beacons
-static (int, int, List<(int, int)>) GetMatchingGroups(List<Scanner> groups)
+(Scanner MergedBeacons, List<Vector3> ScannerPositions) MergeScanners(List<Scanner> scanners)
 {
-    for (var i = 0; i < groups.Count; ++i)
-    {
-        for (var j = i + 1; j < groups.Count; ++j)
-        {
-            var matchingBeacons = GetMatchingBeacons(groups[i], groups[j]);
+    var mainGroup = scanners[0];
+    scanners.RemoveAt(0);
 
-            if (matchingBeacons.Count >= 12)
+    var scannerPositions = new List<Vector3>
+    {
+        Vector3.Zero
+    };
+
+    // We could also find matching groups more efficiently
+    // but then it would be painful to get scanner positions
+    while (scanners.Count > 0)
+    {
+        foreach (var group in scanners)
+        {
+            var matchingBeacons = GetMatchingBeacons(mainGroup, group);
+            if (matchingBeacons.Count < 12)
             {
-                return (i, j, matchingBeacons);
+                continue;
             }
+
+            var matchingBeacons1 = matchingBeacons.Select(m => mainGroup.Beacons[m.Item1]).ToArray();
+            var matchingBeacons2 = matchingBeacons.Select(m => group.Beacons[m.Item2]).ToArray();
+
+            var diff1 = matchingBeacons1[0] - matchingBeacons1[1];
+            var diff2 = matchingBeacons2[0] - matchingBeacons2[1];
+
+            var rotation = rotations.First(r => diff1 == r(diff2));
+            var scannerDifference = matchingBeacons1[0] - rotation(matchingBeacons2[0]);
+            var rotatedBeacons = group.Beacons.Select(b => rotation(b) + scannerDifference);
+
+            mainGroup = new Scanner(mainGroup.Beacons.Union(rotatedBeacons).ToArray());
+            scannerPositions.Add(scannerDifference);
+            scanners.Remove(group);
+
+            break;
         }
     }
 
-    throw new Exception("No more matching groups");
+    return (mainGroup, scannerPositions);
 }
 
-int Part1(List<Scanner> scanners)
-{
-    while (scanners.Count > 1)
-    {
-        var (i, j, matchingBeacons) = GetMatchingGroups(scanners);
+var mergedScanners = MergeScanners(scanners_.Select(x => new Scanner(x.ToArray())).ToList());
+var distances =
+    from v1 in mergedScanners.ScannerPositions
+    from v2 in mergedScanners.ScannerPositions
+    where v1 != v2
+    select Math.Abs(v1.X - v2.X) + Math.Abs(v1.Y - v2.Y) + Math.Abs(v1.Z - v2.Z);
 
-        var group1 = scanners[i];
-        var group2 = scanners[j];
-
-        //Console.WriteLine($"From {groups.Count} joining {i} ({group1.Beacons.Length}) and {j} ({group2.Beacons.Length}) with {matchingBeacons.Count} matches");
-
-        var matchingBeacons1 = matchingBeacons.Select(m => group1.Beacons[m.Item1]).ToArray();
-        var matchingBeacons2 = matchingBeacons.Select(m => group2.Beacons[m.Item2]).ToArray();
-
-        var diff1 = matchingBeacons1[0] - matchingBeacons1[1];
-        var diff2 = matchingBeacons2[0] - matchingBeacons2[1];
-
-        var rotation = rotations.First(r => diff1 == r(diff2));
-
-        var scannerDifference = matchingBeacons1[0] - rotation(matchingBeacons2[0]);
-
-        var rotatedBeacons = group2.Beacons.Select(b => rotation(b) + scannerDifference);
-        var newGroup = new Scanner(group1.Beacons.Union(rotatedBeacons).ToArray());
-
-        //Console.WriteLine($"     New group size: {newGroup.Beacons.Length}");
-
-        scanners.Remove(group1);
-        scanners.Remove(group2);
-        scanners.Add(newGroup);
-    }
-
-    return scanners.Single().Beacons.Length;
-}
-
-Console.WriteLine($"Part 1: {Part1(scanners_.Select(x => new Scanner(x.ToArray())).ToList())}");
+Console.WriteLine($"Part 1: {mergedScanners.MergedBeacons.Beacons.Length}");
+Console.WriteLine($"Part 2: {distances.Max()}");
