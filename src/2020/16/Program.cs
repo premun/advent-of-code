@@ -17,7 +17,7 @@ var nearbyTickets = lines
     .SkipWhile(l => l != "nearby tickets:")
     .Skip(1)
     .Select(l => l.SplitToNumbers())
-    .ToArray();
+    .ToList();
 
 var invalidRate = nearbyTickets
     .SelectMany(n => n)
@@ -27,45 +27,46 @@ var invalidRate = nearbyTickets
 Console.WriteLine($"Part 1: {invalidRate}");
 
 var fieldMapping = new Dictionary<int, string>();
-var allTickets = nearbyTickets
+var validTickets = nearbyTickets
     .Where(t => t.All(n => fields.GetMatching(n).Any()))
     .Append(myTicket)
-    .ToArray();
+    .ToList();
 
 while (fieldMapping.Count < myTicket.Length)
 {
     var unmappedFields = Enumerable.Range(0, myTicket.Length)
-        .Except(fieldMapping.Keys.ToArray())
-        .ToArray();
+        .Except(fieldMapping.Keys.ToList())
+        .ToList();
 
-    foreach (var ticket in allTickets)
+    foreach (var unmappedField in unmappedFields)
     {
-        bool found = false;
+        var matchingFields = validTickets
+            .Select(t => t[unmappedField])
+            .Select(n => fields.GetMatching(n).Select(f => f.Name).Except(fieldMapping.Values).ToList());
 
-        for (int i = 0; i < unmappedFields.Length; i++)
+        var intersection = matchingFields.First();
+        foreach (var matching in matchingFields.Skip(1))
         {
-            var number = ticket[unmappedFields[i]];
-            var belongsTo = fields.GetMatching(number).ToList();
+            intersection = intersection.Intersect(matching).ToList();
 
-            if (belongsTo.Count == 1)
+            if (intersection.Count == 1)
             {
-                Console.WriteLine($"Mapping {belongsTo[0]} to {i}");
-                fieldMapping.Add(unmappedFields[i], belongsTo[0]);
-                found = true;
                 break;
             }
         }
 
-        if (found == true)
+        if (intersection.Count == 1)
         {
+            // Console.WriteLine($"Mapping {intersection[0]} to {unmappedField}");
+            fieldMapping.Add(unmappedField, intersection[0]);
             break;
         }
     }
 }
 
 var departures = fieldMapping
-        .Where(p => p.Value.StartsWith("departure "))
-        .Select(p => myTicket[p.Key])
-        .Aggregate((n, acc) => n * acc);
+    .Where(p => p.Value.StartsWith("departure "))
+    .Select(p => (long)myTicket[p.Key])
+    .Aggregate((n, acc) => n * acc);
 
 Console.WriteLine($"Part 2: {departures}");

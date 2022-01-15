@@ -39,10 +39,8 @@ class Field
 
 static class FieldExtensions
 {
-    public static IEnumerable<string> GetMatching(this Dictionary<string, Field> fields, int number)
+    public static IEnumerable<Field> GetMatching(this Dictionary<string, Field> fields, int number)
     {
-        return fields
-            .Where(f => f.Value.Includes(number))
-            .Select(f => f.Key);
+        return fields.Values.Where(f => f.Includes(number));
     }
 }
