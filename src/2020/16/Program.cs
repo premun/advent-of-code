@@ -1,21 +1,12 @@
-﻿using AdventOfCode.Common;
+﻿using AdventOfCode._2020_16;
+using AdventOfCode.Common;
 
 var lines = Resources.GetResourceFileLines("input.txt");
 
 var fields = lines
     .TakeWhile(l => l != "your ticket:")
-    .Select(line =>
-    {
-        var parts = line.Split(':');
-        var intervals = parts[1].Trim().Split(" or ");
-
-        return (Name: parts[0], Intervals: intervals.Select(i =>
-        {
-            var numbers = i.Split('-').Select(int.Parse);
-            return (Min: numbers.ElementAt(0), Max: numbers.ElementAt(1));
-        }).ToArray());
-    })
-    .ToArray();
+    .Select(Field.FromString)
+    .ToDictionary(f => f.Name);
 
 var myTicket = lines
     .SkipWhile(l => l != "your ticket:")
@@ -30,7 +21,51 @@ var nearbyTickets = lines
 
 var invalidRate = nearbyTickets
     .SelectMany(n => n)
-    .Where(n => fields.All(f => f.Intervals.All(i => n < i.Min || n > i.Max)))
+    .Where(n => !fields.GetMatching(n).Any())
     .Sum();
 
 Console.WriteLine($"Part 1: {invalidRate}");
+
+var fieldMapping = new Dictionary<int, string>();
+var allTickets = nearbyTickets
+    .Where(t => t.All(n => fields.GetMatching(n).Any()))
+    .Append(myTicket)
+    .ToArray();
+
+while (fieldMapping.Count < myTicket.Length)
+{
+    var unmappedFields = Enumerable.Range(0, myTicket.Length)
+        .Except(fieldMapping.Keys.ToArray())
+        .ToArray();
+
+    foreach (var ticket in allTickets)
+    {
+        bool found = false;
+
+        for (int i = 0; i < unmappedFields.Length; i++)
+        {
+            var number = ticket[unmappedFields[i]];
+            var belongsTo = fields.GetMatching(number).ToList();
+
+            if (belongsTo.Count == 1)
+            {
+                Console.WriteLine($"Mapping {belongsTo[0]} to {i}");
+                fieldMapping.Add(unmappedFields[i], belongsTo[0]);
+                found = true;
+                break;
+            }
+        }
+
+        if (found == true)
+        {
+            break;
+        }
+    }
+}
+
+var departures = fieldMapping
+        .Where(p => p.Value.StartsWith("departure "))
+        .Select(p => myTicket[p.Key])
+        .Aggregate((n, acc) => n * acc);
+
+Console.WriteLine($"Part 2: {departures}");
