@@ -74,4 +74,8 @@ public static class Resources
     public static char[,] ParseAsArray(this IEnumerable<string> input) => ParseAsArray(input, c => c);
 
     public static char[][] ParseAsJaggedArray(this IEnumerable<string> input) => ParseAsJaggedArray(input, c => c);
+
+    public static IEnumerable<IGrouping<int, string>> GroupsOf(this IEnumerable<string> input, int groupSize) => input
+        .Select((item, index) => (Group: index / groupSize, Items: item))
+        .GroupBy(k => k.Group, v => v.Items);
 }
