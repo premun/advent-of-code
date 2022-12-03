@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 
 namespace AdventOfCode.Common;
 
@@ -75,7 +76,28 @@ public static class Resources
 
     public static char[][] ParseAsJaggedArray(this IEnumerable<string> input) => ParseAsJaggedArray(input, c => c);
 
-    public static IEnumerable<IGrouping<int, T>> GroupsOf<T>(this IEnumerable<T> input, int groupSize) => input
-        .Select((item, index) => (Group: index / groupSize, Items: item))
-        .GroupBy(k => k.Group, v => v.Items);
+    public static IEnumerable<IEnumerable<T>> GroupsOf<T>(this IEnumerable<T> input, int groupSize)
+    {
+        var current = new T[groupSize];
+        var index = 0;
+
+        foreach (var item in input)
+        {
+            current[index++] = item;
+            if (index != groupSize)
+            {
+                continue;
+            }
+
+            yield return current;
+
+            current = new T[groupSize];
+            index = 0;
+        }
+
+        if (index > 0)
+        {
+            yield return current.Take(index).ToArray();
+        }
+    }
 }
