@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var population = Resources.GetResourceFileLines("input.txt").First().SplitToNumbers();
+var population = Resources.GetInputFileLines().First().SplitToNumbers();
 
 static long[] CreateHistogram(IEnumerable<int> population)
 {

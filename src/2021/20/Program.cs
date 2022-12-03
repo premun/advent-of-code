@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_20;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 var enhancementAlgorithm = lines.First().Select(c => c == '#').ToList().AsReadOnly();
 
 var image = lines.Skip(1).Select(line => line.Select(c => c == '#').ToArray()).ToArray();

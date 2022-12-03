@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_12;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 var caves = new Dictionary<string, Cave>();
 

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 string template = lines.First();
 Dictionary<(char, char), char> rules = lines

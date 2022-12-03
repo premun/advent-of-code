@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_21;
 using AdventOfCode.Common;
 
-var startingPositions = Resources.GetResourceFileLines("input.txt")
+var startingPositions = Resources.GetInputFileLines()
     .Select(line => line.Split(" ").Last())
     .Select(int.Parse)
     .ToArray();

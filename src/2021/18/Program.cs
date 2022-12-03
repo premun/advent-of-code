@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_18;
 using AdventOfCode.Common;
 
-var numbers = Resources.GetResourceFileLines("input.txt").Select(SnailfishParser.Parse).ToArray();
+var numbers = Resources.GetInputFileLines().Select(SnailfishParser.Parse).ToArray();
 
 var part1 = numbers.Aggregate((acc, n) => acc + n).Magnitude;
 

@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using AdventOfCode.Common;
 
-var passports = Resources.GetResourceFile("input.txt")
+var passports = Resources.GetInputFileContent()
     .Split(Environment.NewLine + Environment.NewLine, StringSplitOptions.None)
     .Select(passport => passport.Replace(Environment.NewLine, " "))
     .ToArray();

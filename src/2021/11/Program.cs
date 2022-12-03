@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var map = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray(c => c - '0');
+var map = Resources.GetInputFileLines().ParseAsJaggedArray(c => c - '0');
 
 static int Step(int[][] map)
 {
@@ -92,7 +92,7 @@ static int Part2(int[][] map)
 
 Console.WriteLine($"Part 1: {Part1(map)}");
 
-map = Resources.GetResourceFileLines("input.txt")
+map = Resources.GetInputFileLines()
     .Select(line => line.Select(n => n - '0').ToArray())
     .ToArray();
 

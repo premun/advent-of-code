@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var positions = Resources.GetResourceFileLines("input.txt").First().SplitToNumbers();
+var positions = Resources.GetInputFileLines().First().SplitToNumbers();
 
 static (int[], int, int) CreateHistogram(IEnumerable<int> positions)
 {

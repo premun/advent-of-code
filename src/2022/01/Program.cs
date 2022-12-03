@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFile("input.txt").Split(Environment.NewLine);
+var lines = Resources.GetInputFileContent().Split(Environment.NewLine);
 
 var elfs = new List<List<int>>
 {

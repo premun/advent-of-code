@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var groups = Resources.GetResourceFile("input.txt")
+var groups = Resources.GetInputFileContent()
     .Split(Environment.NewLine + Environment.NewLine, StringSplitOptions.None)
     .Select(s => s.SplitBy(Environment.NewLine))
     .ToArray();

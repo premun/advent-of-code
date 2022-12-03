@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var depths = Resources.GetResourceFileLines("input.txt").Select(int.Parse).ToArray();
+var depths = Resources.GetInputFileLines().Select(int.Parse).ToArray();
 
 static int GetIncreaseCount(int[] depths, int lookback)
 {

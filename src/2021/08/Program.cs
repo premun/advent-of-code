@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_08;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 static int Part1(IEnumerable<string> lines)
 {

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var input = Resources.GetResourceFileLines("input.txt").First();
+var input = Resources.GetInputFileLines().First();
 
 var coordinates = input
     .Substring("target area: x=".Length)

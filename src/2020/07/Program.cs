@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 var regex = new Regex(
     @"^(?<parent>[a-z ]+) bags contain (?<count1>\d+) (?<child1>[a-z ]+) bags?"

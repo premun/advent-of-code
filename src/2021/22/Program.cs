@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_22;
 using AdventOfCode.Common;
 
-var cuboids = Resources.GetResourceFileLines("input.txt")
+var cuboids = Resources.GetInputFileLines()
     .Select(line => line.Split(" "))
     .Select(parts =>
     (   parts[0] == "on",

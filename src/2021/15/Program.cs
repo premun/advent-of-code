@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_15;
 using AdventOfCode.Common;
 
-var map = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray(c => c - '0');
+var map = Resources.GetInputFileLines().ParseAsJaggedArray(c => c - '0');
 
 static int[][] Resize(int[][] map, int factor)
 {

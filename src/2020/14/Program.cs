@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 static void ProcessInput(string[] instructions, Action<string> onMask, Action<long, long> onInstruction)
 {

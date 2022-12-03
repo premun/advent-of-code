@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var startingNumbers = Resources.GetResourceFile("input.txt").SplitToNumbers();
+var startingNumbers = Resources.GetInputFileContent().SplitToNumbers();
 
 static int GetNumber(int[] startingNumbers, int index)
 {

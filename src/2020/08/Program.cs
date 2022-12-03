@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2020_08;
 using AdventOfCode.Common;
 
-(Operation Operation, int Argument)[] instructions = Resources.GetResourceFileLines("input.txt")
+(Operation Operation, int Argument)[] instructions = Resources.GetInputFileLines()
     .Select(line =>
     {
         var parts = line.Split(' ');

@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_09;
 using AdventOfCode.Common;
 
-var heatMap = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray(c => c - '0');
+var heatMap = Resources.GetInputFileLines().ParseAsJaggedArray(c => c - '0');
 
 static long Part1(int[][] heatMap)
 {

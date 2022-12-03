@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var coordinates = Resources.GetResourceFileLines("input.txt")
+var coordinates = Resources.GetInputFileLines()
     .Select(line =>
     {
         var coor = line.SplitBy(" -> ")

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var numbers = Resources.GetResourceFileLines("input.txt")
+var numbers = Resources.GetInputFileLines()
     .Select(long.Parse)
     .ToArray();
 

@@ -4,16 +4,18 @@ namespace AdventOfCode.Common;
 
 public static class Resources
 {
-    public static string[] GetResourceFileLines(string resourceFileName)
-        => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName).SplitBy(Environment.NewLine);
+    private const string DefaultInputName = "input.txt";
 
-    public static string GetResourceFile(string resourceFileName)
-        => GetResourceFile(Assembly.GetCallingAssembly(), resourceFileName);
+    public static string[] GetInputFileLines(string resourceFileName = DefaultInputName)
+        => GetResourceFileContent(Assembly.GetCallingAssembly(), resourceFileName).SplitBy(Environment.NewLine);
 
-    public static StreamReader GetResourceStream(string resourceFileName)
+    public static string GetInputFileContent(string resourceFileName = DefaultInputName)
+        => GetResourceFileContent(Assembly.GetCallingAssembly(), resourceFileName);
+
+    public static StreamReader GetResourceStream(string resourceFileName = DefaultInputName)
         => new(GetResourceStream(Assembly.GetCallingAssembly(), resourceFileName));
 
-    private static string GetResourceFile(Assembly assembly, string resourceFileName)
+    private static string GetResourceFileContent(Assembly assembly, string resourceFileName = DefaultInputName)
     {
         using (var stream = GetResourceStream(assembly, resourceFileName))
         using (var sr = new StreamReader(stream ?? throw new FileNotFoundException($"Couldn't locate resource file '{resourceFileName}'")))
@@ -22,7 +24,7 @@ public static class Resources
         }
     }
 
-    private static Stream GetResourceStream(Assembly assembly, string resourceFileName)
+    private static Stream GetResourceStream(Assembly assembly, string resourceFileName = DefaultInputName)
     {
         Stream? stream = assembly.GetManifestResourceStream($"{assembly.GetName().Name}.{resourceFileName}");
 
@@ -58,11 +60,9 @@ public static class Resources
         var result = new T[list.Count, columnCount];
 
         for (int row = 0; row < list.Count; row++)
+        for (int column = 0; column < columnCount; column++)
         {
-            for (int column = 0; column < columnCount; column++)
-            {
-                result[row, column] = parser(list[row][column]);
-            }
+            result[row, column] = parser(list[row][column]);
         }
 
         return result;
@@ -75,7 +75,7 @@ public static class Resources
 
     public static char[][] ParseAsJaggedArray(this IEnumerable<string> input) => ParseAsJaggedArray(input, c => c);
 
-    public static IEnumerable<IGrouping<int, string>> GroupsOf(this IEnumerable<string> input, int groupSize) => input
+    public static IEnumerable<IGrouping<int, T>> GroupsOf<T>(this IEnumerable<T> input, int groupSize) => input
         .Select((item, index) => (Group: index / groupSize, Items: item))
         .GroupBy(k => k.Group, v => v.Items);
 }

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var seats = Resources.GetResourceFile("input.txt")
+var seats = Resources.GetInputFileContent()
     .Replace("F", "0")
     .Replace("B", "1")
     .Replace("R", "1")

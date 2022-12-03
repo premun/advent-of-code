@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_10;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 Dictionary<char, char> pairs = new()
 {

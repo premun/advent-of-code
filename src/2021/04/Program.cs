@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_04;
 using AdventOfCode.Common;
 
-using var inputReader = Resources.GetResourceStream("input.txt");
+using var inputReader = Resources.GetResourceStream();
 
 var drawnNumbers = inputReader.ReadLine()!.SplitToNumbers();
 

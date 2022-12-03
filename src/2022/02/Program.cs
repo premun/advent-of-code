@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var rounds = Resources.GetResourceFileLines("input.txt").Select(l => (l[0], l[2])).ToList();
+var rounds = Resources.GetInputFileLines().Select(l => (l[0], l[2])).ToList();
 
 static int ChoiceScore(char choice) => choice < 'D'
     ? choice - 'A' + 1

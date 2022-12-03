@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2020_16;
 using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 var fields = lines
     .TakeWhile(l => l != "your ticket:")

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-char[][] seafloor = Resources.GetResourceFileLines("input.txt").ParseAsJaggedArray();
+char[][] seafloor = Resources.GetInputFileLines().ParseAsJaggedArray();
 
 int width = seafloor[0].Length;
 int height = seafloor.Length;

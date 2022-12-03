@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var adapters = Resources.GetResourceFileLines("input.txt")
+var adapters = Resources.GetInputFileLines()
     .Select(int.Parse)
     .OrderBy(x => x)
     .ToArray();

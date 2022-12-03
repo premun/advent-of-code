@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 static int GetScore(char c) => c + 1 - (c >= 'a' ? 'a' : 'A' - 26);
 

@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var map = Resources.GetResourceFileLines("input.txt").ParseAsArray();
+var map = Resources.GetInputFileLines().ParseAsArray();
 
 static bool TrySimulate(
     char[,] map,

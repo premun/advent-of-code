@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines();
 
 static void Simulate(string[] lines, Action<int> forward, Action<int> down, Action<int> up)
 {

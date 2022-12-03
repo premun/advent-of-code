@@ -1,7 +1,7 @@
 ﻿using AdventOfCode._2021_16;
 using AdventOfCode.Common;
 
-var input = Resources.GetResourceFileLines("input.txt").First();
+var input = Resources.GetInputFileLines().First();
 
 var packet = Packet.ParseFromStream(new BitReader(input));
 

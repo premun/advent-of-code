@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var numbers = Resources.GetResourceFile("input.txt")
+var numbers = Resources.GetInputFileContent()
     .Split(Environment.NewLine)
     .Where(s => !string.IsNullOrEmpty(s))
     .Select(x => long.Parse(x));
