@@ -8,3 +8,5 @@
 | [Day 3](https://adventofcode.com/2022/day/3) | ⭐ | ⭐ |
 | [Day 4](https://adventofcode.com/2022/day/4) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
+
+*\* Updated automatically by [@k2bd/advent-readme-stars](https://github.com/marketplace/actions/advent-readme-stars)*
