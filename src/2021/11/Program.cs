@@ -5,17 +5,6 @@ var map = Resources.GetInputFileLines().ParseAsJaggedArray(c => c - '0');
 static int Step(int[][] map)
 {
     var flashingOctos = new Queue<Coor>();
-    var directions = new Coor[]
-    {
-        new(-1, -1),
-        new(-1, 0),
-        new(-1, 1),
-        new(0, -1),
-        new(0, 1),
-        new(1, -1),
-        new(1, 0),
-        new(1, 1),
-    };
 
     // First increase all by 1
     for (int row = 0; row < map.Length; row++)
@@ -35,7 +24,7 @@ static int Step(int[][] map)
     {
         flashedOctos.Enqueue(flashing);
 
-        foreach (var direction in directions)
+        foreach (var direction in Coor.NineWayNeighbours)
         {
             var around = flashing + direction;
 
