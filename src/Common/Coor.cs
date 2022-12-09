@@ -2,6 +2,8 @@
 
 public record Coor(int Y, int X)
 {
+    public static readonly Coor Zero = new(0, 0);
+
     public static Coor operator -(Coor me, Coor other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor operator +(Coor me, Coor other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
@@ -27,4 +29,31 @@ public record Coor(int Y, int X)
         new(1, 0),
         new(1, 1),
     };
+
+    public static bool operator ==(Coor me, (int, int) other) => new Coor(other.Item1, other.Item2) == me;
+    public static bool operator !=(Coor me, (int, int) other) => !(me == other);
+    public static Coor operator +(Coor me, (int, int) other) => new(Y: me.Y + other.Item1, X: me.X + other.Item2);
+    public static Coor operator -(Coor me, (int, int) other) => new(Y: me.Y - other.Item1, X: me.X - other.Item2);
+}
+
+public static class CoorExtensions
+{
+    public static void Visualize(this ICollection<Coor> coors, Coor? min, Coor? max)
+    {
+        min ??= new Coor(coors.Min(c => c.Y), coors.Min(c => c.X));
+        max ??= new Coor(coors.Max(c => c.Y), coors.Max(c => c.X));
+
+        var width = max.X - min.X + 1;
+        var height = max.Y - min.Y + 1;
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                Console.Write(coors.Contains(new(y, x)) ? '#' : '.');
+            }
+
+            Console.WriteLine();
+        }
+    }
 }
