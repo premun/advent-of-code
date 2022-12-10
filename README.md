@@ -12,6 +12,7 @@
 | [Day 7](https://adventofcode.com/2022/day/7) | ⭐ | ⭐ |
 | [Day 8](https://adventofcode.com/2022/day/8) | ⭐ | ⭐ |
 | [Day 9](https://adventofcode.com/2022/day/9) | ⭐ | ⭐ |
+| [Day 10](https://adventofcode.com/2022/day/10) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
 
 *\* Updated automatically by [@k2bd/advent-readme-stars](https://github.com/marketplace/actions/advent-readme-stars)*
