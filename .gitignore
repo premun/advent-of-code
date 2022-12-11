@@ -360,3 +360,6 @@ MigrationBackup/
 
 # some ide stuff
 .idea
+
+# Advent of Code input files because Eric asked to not publish them
+input.txt
