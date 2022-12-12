@@ -2,13 +2,16 @@
 
 public record Coor(int Y, int X)
 {
+    public int Row => Y;
+    public int Col => X;
+
     public static readonly Coor Zero = new(0, 0);
 
     public static Coor operator -(Coor me, Coor other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor operator +(Coor me, Coor other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
-    public bool InBoundsOf(int[,] array) =>
-        Y >= 0 && Y < array.GetLength(0) && X >= 0 && X < array.GetLength(1);
+    public bool InBoundsOf<T>(T[,] array)
+        => Y >= 0 && Y < array.GetLength(0) && X >= 0 && X < array.GetLength(1);
 
     public static readonly Coor[] FourWayNeighbours =
     {
@@ -56,4 +59,10 @@ public static class CoorExtensions
             Console.WriteLine();
         }
     }
+
+    public static T Get<T>(this T[,] items, Coor coor)
+        => items[coor.Y, coor.X];
+    
+    public static T Set<T>(this T[,] items, Coor coor, T value)
+        => items[coor.Y, coor.X] = value;
 }

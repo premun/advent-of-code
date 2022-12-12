@@ -10,7 +10,7 @@ var assignments = lines
     .Select(g =>
         (new Assignment(int.Parse(g[1].Value), int.Parse(g[2].Value)),
          new Assignment(int.Parse(g[3].Value), int.Parse(g[4].Value))))
-    .Select(a => a.Item1.Start <= a.Item2.Start ? a : new Row(a.Item2, a.Item1))
+    .Select(a => a.Item1.Start <= a.Item2.Start ? a : (a.Item2, a.Item1))
     .ToList();
 
 var inclusiveAssignments = assignments
