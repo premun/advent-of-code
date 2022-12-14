@@ -6,6 +6,7 @@ public record Coor(int Y, int X)
     public int Col => X;
 
     public static readonly Coor Zero = new(0, 0);
+    public static readonly Coor One = new(1, 1);
 
     public static Coor operator -(Coor me, Coor other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor operator +(Coor me, Coor other) => new(Y: me.Y + other.Y, X: me.X + other.X);
@@ -37,6 +38,8 @@ public record Coor(int Y, int X)
     public static bool operator !=(Coor me, (int, int) other) => !(me == other);
     public static Coor operator +(Coor me, (int, int) other) => new(Y: me.Y + other.Item1, X: me.X + other.Item2);
     public static Coor operator -(Coor me, (int, int) other) => new(Y: me.Y - other.Item1, X: me.X - other.Item2);
+
+    public override string ToString() => $"[{Y},{X}]";
 }
 
 public static class CoorExtensions
