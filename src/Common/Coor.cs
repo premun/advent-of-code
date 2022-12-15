@@ -39,6 +39,8 @@ public record Coor(int Y, int X)
     public static Coor operator +(Coor me, (int, int) other) => new(Y: me.Y + other.Item1, X: me.X + other.Item2);
     public static Coor operator -(Coor me, (int, int) other) => new(Y: me.Y - other.Item1, X: me.X - other.Item2);
 
+    public static int ManhattanDistance(Coor me, Coor other) => Math.Abs(me.Y - other.Y) + Math.Abs(me.X - other.X);
+
     public override string ToString() => $"[{Y},{X}]";
 }
 
