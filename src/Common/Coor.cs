@@ -41,6 +41,8 @@ public record Coor(int Y, int X)
 
     public static int ManhattanDistance(Coor me, Coor other) => Math.Abs(me.Y - other.Y) + Math.Abs(me.X - other.X);
 
+    public int ManhattanDistance(Coor other) => ManhattanDistance(this, other);
+
     public override string ToString() => $"[{Y},{X}]";
 }
 
