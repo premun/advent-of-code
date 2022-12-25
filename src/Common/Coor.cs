@@ -8,6 +8,11 @@ public record Coor(int Y, int X)
     public static readonly Coor Zero = new(0, 0);
     public static readonly Coor One = new(1, 1);
 
+    public static readonly Coor Up = new(-1, 0);
+    public static readonly Coor Down = new(1, 0);
+    public static readonly Coor Left = new(0, -1);
+    public static readonly Coor Right = new(0, 1);
+
     public static Coor operator -(Coor me, Coor other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor operator +(Coor me, Coor other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
@@ -20,6 +25,14 @@ public record Coor(int Y, int X)
         new (0, -1),
         new (0, 1),
         new (1, 0),
+    };
+
+    public static readonly Coor[] Directions =
+    {
+        Right,
+        Down,
+        Left,
+        Up,
     };
 
     public static readonly Coor[] NineWayNeighbours =
@@ -61,6 +74,20 @@ public static class CoorExtensions
             for (var x = 0; x < width; x++)
             {
                 Console.Write(coors.Contains(new(y, x)) ? '#' : '.');
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    public static void Print(this char[,] map, Func<Coor, char?>? printOverride = null)
+    {
+        for (var y = 0; y < map.GetLength(0); y++)
+        {
+            for (var x = 0; x < map.GetLength(1); x++)
+            {
+                var c = printOverride?.Invoke(new(y, x)) ?? map[y, x];
+                Console.Write(c);
             }
 
             Console.WriteLine();
