@@ -18,7 +18,9 @@
 | [Day 13](https://adventofcode.com/2022/day/13) | ⭐ | ⭐ |
 | [Day 14](https://adventofcode.com/2022/day/14) | ⭐ | ⭐ |
 | [Day 15](https://adventofcode.com/2022/day/15) | ⭐ | ⭐ |
+| [Day 17](https://adventofcode.com/2022/day/17) | ⭐ |   |
 | [Day 21](https://adventofcode.com/2022/day/21) | ⭐ | ⭐ |
+| [Day 22](https://adventofcode.com/2022/day/22) | ⭐ |   |
 <!--- advent_readme_stars table --->
 
 ## 2021 Results
