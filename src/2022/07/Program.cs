@@ -4,7 +4,7 @@ var lines = Resources.GetInputFileLines();
 
 static Directory ParseFileTree(string[] input)
 {
-    var root = new Directory("/", null, new());
+    var root = new Directory("/", null, []);
     Directory currentDir = root;
 
     var commandLine = new Queue<string>(input);
@@ -17,7 +17,7 @@ static Directory ParseFileTree(string[] input)
                 "/" => root,
                 ".." => currentDir.Parent!,
                 string name => (Directory)(currentDir.Items.FirstOrDefault(i => i is Directory && i.Name == name)
-                    ?? new Directory(name, currentDir, new()))
+                    ?? new Directory(name, currentDir, []))
             };
 
             continue;
@@ -30,7 +30,7 @@ static Directory ParseFileTree(string[] input)
                 child = commandLine.Dequeue();
                 if (child is ['d', 'i', 'r', ' ', .. string name])
                 {
-                    currentDir.Items.Add(new Directory(name, currentDir, new()));
+                    currentDir.Items.Add(new Directory(name, currentDir, []));
                 }
                 else
                 {
@@ -46,7 +46,7 @@ static Directory ParseFileTree(string[] input)
 
 static Dictionary<string, long> GetDirectorySizes(Directory root, string path = "/", Dictionary<string, long>? sizes = null)
 {
-    sizes ??= new Dictionary<string, long>();
+    sizes ??= [];
 
     long size = root.Items
         .Select(item =>

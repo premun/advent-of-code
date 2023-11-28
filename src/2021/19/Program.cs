@@ -43,7 +43,7 @@ foreach (var line in lines)
 {
     if (line.StartsWith("--- scanner"))
     {
-        scanners_.Add(new List<Vector3>());
+        scanners_.Add([]);
     }
     else
     {

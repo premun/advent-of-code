@@ -32,7 +32,7 @@ foreach (var line in lines)
     List<(string, int)> children;
     if (!bags.TryGetValue(parent, out var refs))
     {
-        bags[parent] = (_, children) = (new List<string>(), new());
+        bags[parent] = (_, children) = (new List<string>(), []);
     }
     else
     {
@@ -52,7 +52,7 @@ foreach (var line in lines)
         List<string> parents;
         if (!bags.TryGetValue(child, out var references))
         {
-            bags[child] = (parents, _) = (new(), new List<(string, int)>());
+            bags[child] = (parents, _) = ([], new List<(string, int)>());
         }
         else
         {

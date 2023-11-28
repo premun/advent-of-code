@@ -76,7 +76,7 @@ static long ScoreCompletion(IEnumerable<char> missing)
 }
 
 long corruptionScore = 0;
-List<long> completionScores = new();
+List<long> completionScores = [];
 
 foreach (var line in lines)
 {

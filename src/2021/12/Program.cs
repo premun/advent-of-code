@@ -34,14 +34,14 @@ foreach (var line in lines)
 
 static List<List<Cave>> FindAllPaths(Cave from, Cave to, bool allowSmallCaveReentry)
 {
-    return FindPaths(new(), from, to, allowSmallCaveReentry);
+    return FindPaths([], from, to, allowSmallCaveReentry);
 }
 
 static List<List<Cave>> FindPaths(List<Cave> path, Cave current, Cave to, bool allowSmallCaveReentry)
 {
     if (current == to)
     {
-        return new() { path/*.Append(to).ToList()*/ };
+        return [path/*.Append(to).ToList()*/];
     }
 
     path.Add(current);

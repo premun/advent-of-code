@@ -11,7 +11,7 @@ foreach (var line in lines)
 {
     if (string.IsNullOrEmpty(line))
     {
-        elfs.Add(new());
+        elfs.Add([]);
         continue;
     }
 

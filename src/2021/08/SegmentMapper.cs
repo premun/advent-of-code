@@ -40,7 +40,7 @@ class SegmentMapper
         { 9, "abcdfg" },
     };
 
-    private readonly Dictionary<char, char> _segmentMapping = new();
+    private readonly Dictionary<char, char> _segmentMapping = [];
 
     public void ResolveDigits(string[] signals)
     {
@@ -48,7 +48,7 @@ class SegmentMapper
             .OrderBy(digit => digit.Length is 2 or 3 or 4 or 7 ? -1 : 1) // Optimization
             .ToDictionary(d => d, d => FindMappings(d).ToHashSet());
 
-        var disallowedMappings = FindDisallowedMappings(orderedSignals, new HashSet<Mapping>());
+        var disallowedMappings = FindDisallowedMappings(orderedSignals, []);
 
         if (disallowedMappings == null)
         {

@@ -15,7 +15,7 @@ class BasinMap
     {
         _heatMap = heatMap;
         _basinMap = new Basin[heatMap.Length, heatMap[0].Length];
-        _basins = new();
+        _basins = [];
     }
 
     public IEnumerable<Basin> FindBasins()

@@ -11,7 +11,7 @@ class Chamber
 
     public Chamber(int height, int width, bool[] jetPattern)
     {
-        _world = new();
+        _world = [];
         _jetPattern = jetPattern;
         _currentInstruction = jetPattern.Length - 1;
 
