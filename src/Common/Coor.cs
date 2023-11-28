@@ -20,23 +20,23 @@ public record Coor(int Y, int X)
         => Y >= 0 && Y < array.GetLength(0) && X >= 0 && X < array.GetLength(1);
 
     public static readonly Coor[] FourWayNeighbours =
-    {
+    [
         new (-1, 0),
         new (0, -1),
         new (0, 1),
         new (1, 0),
-    };
+    ];
 
     public static readonly Coor[] Directions =
-    {
+    [
         Right,
         Down,
         Left,
         Up,
-    };
+    ];
 
     public static readonly Coor[] NineWayNeighbours =
-    {
+    [
         new(-1, -1),
         new(-1, 0),
         new(-1, 1),
@@ -45,7 +45,7 @@ public record Coor(int Y, int X)
         new(1, -1),
         new(1, 0),
         new(1, 1),
-    };
+    ];
 
     public static bool operator ==(Coor me, (int, int) other) => new Coor(other.Item1, other.Item2) == me;
     public static bool operator !=(Coor me, (int, int) other) => !(me == other);

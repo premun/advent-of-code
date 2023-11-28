@@ -10,13 +10,9 @@ Dictionary<(char, char), char> rules = lines
 
 static void AddOrBump<TKey>(Dictionary<TKey, long> dict, TKey key, long amount) where TKey : notnull
 {
-    if (dict.ContainsKey(key))
+    if (!dict.TryAdd(key, amount))
     {
         dict[key] += amount;
-    }
-    else
-    {
-        dict.Add(key, amount);
     }
 }
 

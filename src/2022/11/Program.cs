@@ -14,7 +14,7 @@ var matches = inputRegex.Matches(Resources.GetInputFileContent());
 var monkeys1 = new Dictionary<int, Monkey>();
 var monkeys2 = new Dictionary<int, Monkey>();
 
-foreach (Match match in matches)
+foreach (Match match in matches.Cast<Match>())
 {
     var name = int.Parse(match.Groups["name"].Value);
     var items = match.Groups["startingItems"].Value.Split(", ").Select(ulong.Parse);

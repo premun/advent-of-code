@@ -24,7 +24,7 @@ class SegmentMapper
 {
     private record Mapping(char From, char To);
 
-    private static readonly char[] s_segments = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
+    private static readonly char[] s_segments = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
 
     private static readonly Dictionary<int, string> s_digits = new()
     {
@@ -61,7 +61,7 @@ class SegmentMapper
         }
     }
 
-    private HashSet<Mapping>? FindDisallowedMappings(
+    private static HashSet<Mapping>? FindDisallowedMappings(
         IEnumerable<KeyValuePair<string, HashSet<string>>> signals,
         HashSet<Mapping> mappings)
     {
@@ -131,29 +131,29 @@ class SegmentMapper
         return result;
     }
 
-    private static IEnumerable<string> FindMappings(string signal) => signal.Length switch
+    private static string[] FindMappings(string signal) => signal.Length switch
     {
         // This is 1
-        2 => new[] { s_digits[1] },
+        2 => [s_digits[1]],
 
         // This is 7
-        3 => new[] { s_digits[7] },
+        3 => [s_digits[7]],
 
         // This is 4
-        4 => new[] { s_digits[4] },
+        4 => [s_digits[4]],
 
         // Can be 2, 3, 5
-        5 => new[] { s_digits[2], s_digits[3], s_digits[5] },
+        5 => [s_digits[2], s_digits[3], s_digits[5]],
 
         // Can be 0, 6, 9
-        6 => new[] { s_digits[0], s_digits[6], s_digits[9] },
+        6 => [s_digits[0], s_digits[6], s_digits[9]],
 
         // This is 8
-        7 => new[] { s_digits[8] },
+        7 => [s_digits[8]],
 
         _ => throw new ArgumentException($"Invalid signal: '{signal}'"),
     };
 
-    private static IEnumerable<char> GetDistinctChars(params string[] strings)
+    private static char[] GetDistinctChars(params string[] strings)
         => strings.SelectMany(x => x).Distinct().ToArray();
 }

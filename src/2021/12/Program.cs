@@ -57,7 +57,7 @@ static List<List<Cave>> FindPaths(List<Cave> path, Cave current, Cave to, bool a
             continue;
         }
 
-        paths.AddRange(FindPaths(path.ToList(), cave, to, allowSmallCaveReentry));
+        paths.AddRange(FindPaths([.. path], cave, to, allowSmallCaveReentry));
     }
 
     return paths;

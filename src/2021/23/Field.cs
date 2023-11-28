@@ -19,7 +19,7 @@ record EmptyField() : Field
 
 record OccupyableField(char? Occupant) : Field
 {
-    [MemberNotNullWhen(true, "Occupant")]
+    [MemberNotNullWhen(true, nameof(Occupant))]
     public bool IsOccupied => Occupant.HasValue;
 
     public override char ToChar() => IsOccupied ? Occupant.Value : '.';

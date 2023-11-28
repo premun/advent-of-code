@@ -107,9 +107,9 @@ class QuantumDiracDiceGame : DiracDiceGame
 
         foreach (var points in outcomes)
         {
-            if (diceRolls.ContainsKey(points))
+            if (diceRolls.TryGetValue(points, out var value))
             {
-                diceRolls[points]++;
+                diceRolls[points] = ++value;
             }
             else
             {

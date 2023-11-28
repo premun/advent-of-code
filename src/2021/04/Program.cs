@@ -37,7 +37,7 @@ static int GetLastWinningBoardScore(IEnumerable<int> drawnNumbers, IEnumerable<B
 
     foreach (var number in drawnNumbers)
     {
-        while (currentRound.Any())
+        while (currentRound.Count != 0)
         {
             var board = currentRound.Dequeue();
 
@@ -51,7 +51,7 @@ static int GetLastWinningBoardScore(IEnumerable<int> drawnNumbers, IEnumerable<B
             }
         }
 
-        if (!nextRound.Any())
+        if (nextRound.Count == 0)
         {
             return number * (lastWinningBoard ?? throw new Exception("No winning board")).GetSumOfRemainingNumbers();
         }

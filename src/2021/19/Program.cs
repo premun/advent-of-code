@@ -111,7 +111,7 @@ static List<(int, int)> GetMatchingBeacons(Scanner group1, Scanner group2)
     return (mainGroup, scannerPositions);
 }
 
-var mergedScanners = MergeScanners(scanners_.Select(x => new Scanner(x.ToArray())).ToList());
+var mergedScanners = MergeScanners(scanners_.Select(x => new Scanner([.. x])).ToList());
 var distances =
     from v1 in mergedScanners.ScannerPositions
     from v2 in mergedScanners.ScannerPositions

@@ -27,7 +27,7 @@ IEnumerable<char> CompleteLine(string line)
             // current is closing bracket
             if (stack.TryPop(out var opening))
             {
-                if (!pairs.ContainsKey(opening) || current != pairs[opening])
+                if (!pairs.TryGetValue(opening, out var value) || current != value)
                 {
                     // Wrong bracket => corrupted line
                     throw new CorruptedLineException(current);

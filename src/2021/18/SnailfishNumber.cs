@@ -14,10 +14,10 @@ abstract class SnailfishNumber
 
     internal abstract bool TrySplit();
 
-    [MemberNotNullWhen(true, "Parent")]
+    [MemberNotNullWhen(true, nameof(Parent))]
     protected bool IsLeftChild => Parent?.Left == this;
 
-    [MemberNotNullWhen(true, "Parent")]
+    [MemberNotNullWhen(true, nameof(Parent))]
     protected bool IsRightChild => Parent?.Right == this;
 
     internal abstract Literal FindLeaf(bool rightLeaf);
