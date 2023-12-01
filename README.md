@@ -1,4 +1,10 @@
 <!--- advent_readme_stars table --->
+## 2023 Results
+
+| Day | Part 1 | Part 2 |
+| :---: | :---: | :---: |
+| [Day 1](https://adventofcode.com/2023/day/1) | ⭐ | ⭐ |
+<!--- advent_readme_stars table --->
 ## 2022 Results
 
 | Day | Part 1 | Part 2 |
@@ -21,8 +27,8 @@
 | [Day 17](https://adventofcode.com/2022/day/17) | ⭐ |   |
 | [Day 21](https://adventofcode.com/2022/day/21) | ⭐ | ⭐ |
 | [Day 22](https://adventofcode.com/2022/day/22) | ⭐ |   |
-<!--- advent_readme_stars table --->
 
+<!--- advent_readme_stars table --->
 ## 2021 Results
 
 | Day | Part 1 | Part 2 |
