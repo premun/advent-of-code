@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using AdventOfCode.Common;
+﻿using AdventOfCode.Common;
 
 IReadOnlyCollection<Card> cards = Resources.GetInputFileLines()
     .Select(Card.Parse)
@@ -24,13 +23,9 @@ Console.WriteLine($"Part 2: {wonCards.Values.Sum()}");
 
 file record Card(int Id, int MatchingNumbers)
 {
-    private static readonly Regex ParseRegex = new(@"\d+");
-
     public static Card Parse(string definition)
     {
-        var digits = ParseRegex.Matches(definition)
-            .Select(m => int.Parse(m.Value))
-            .ToArray();
+        var digits = definition.ParseNumbersOut();
 
         const int numOfNumbers = 10;
         var winningNumbers = digits.Skip(1).Take(numOfNumbers);

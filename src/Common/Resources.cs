@@ -1,10 +1,12 @@
 ﻿using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Common;
 
 public static class Resources
 {
     private const string DefaultInputName = "input.txt";
+    private static readonly Regex NumberPattern = new(@"\-?\d+");
 
     public static string[] GetInputFileLines(string resourceFileName = DefaultInputName)
         => GetResourceFileContent(Assembly.GetCallingAssembly(), resourceFileName).SplitBy(Environment.NewLine);
@@ -74,6 +76,16 @@ public static class Resources
     public static char[,] ParseAsArray(this IEnumerable<string> input) => ParseAsArray(input, c => c);
 
     public static char[][] ParseAsJaggedArray(this IEnumerable<string> input) => ParseAsJaggedArray(input, c => c);
+
+    public static List<int> ParseNumbersOut(this string line)
+        => NumberPattern.Matches(line)
+            .Select(m => int.Parse(m.Value))
+            .ToList();
+
+    public static List<long> ParseLongNumbersOut(this string line)
+        => NumberPattern.Matches(line)
+            .Select(m => long.Parse(m.Value))
+            .ToList();
 
     public static IEnumerable<IEnumerable<T>> GroupsOf<T>(this IEnumerable<T> input, int groupSize)
     {
