@@ -32,7 +32,7 @@ long part1 = numbers
     .First()
     .Zip(numbers.Last())
     .Select(p => GetNumberOfWays(p.First, p.Second))
-    .Aggregate(1L, (acc, n) => acc * n);
+    .Multiply();
 
 long part2 = GetNumberOfWays(unkernedNumbers.First(), unkernedNumbers.Last());
 

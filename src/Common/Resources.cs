@@ -111,4 +111,13 @@ public static class Resources
             yield return current.Take(index).ToArray();
         }
     }
+
+    public static int Multiply(this IEnumerable<int> values)
+        => values.Aggregate(1, (acc, v) => acc * v);
+
+    public static long MultiplyAsLong(this IEnumerable<int> values)
+        => values.Aggregate(1L, (acc, v) => acc * v);
+
+    public static long Multiply(this IEnumerable<long> values)
+        => values.Aggregate(1L, (acc, v) => acc * v);
 }
