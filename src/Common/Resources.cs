@@ -116,8 +116,36 @@ public static class Resources
         => values.Aggregate(1, (acc, v) => acc * v);
 
     public static long MultiplyAsLong(this IEnumerable<int> values)
-        => values.Aggregate(1L, (acc, v) => acc * v);
+        => values.Aggregate(1, (acc, v) => acc * v);
 
     public static long Multiply(this IEnumerable<long> values)
         => values.Aggregate(1L, (acc, v) => acc * v);
+
+    public static long FindLowestCommonDenominator(this IEnumerable<int> numbers)
+    {
+        long lcm = numbers.First();
+        foreach (int number in numbers.Skip(1))
+        {
+            lcm = GetLeastCommonMultiple(lcm, number);
+        }
+
+        return lcm;
+    }
+
+    public static long GetGreatestCommonDivisor(long a, long b)
+    {
+        while (b != 0)
+        {
+            long temp = b;
+            b = a % b;
+            a = temp;
+        }
+
+        return a;
+    }
+
+    public static long GetLeastCommonMultiple(long a, long b)
+    {
+        return a * b / GetGreatestCommonDivisor(a, b);
+    }
 }
