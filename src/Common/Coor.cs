@@ -1,33 +1,32 @@
-﻿namespace AdventOfCode.Common;
+﻿using System.Numerics;
 
-public record Coor(int Y, int X)
+namespace AdventOfCode.Common;
+
+public record Coor<T>(T Y, T X) where T : INumber<T>
 {
-    public int Row => Y;
-    public int Col => X;
+    public T Row => Y;
+    public T Col => X;
 
-    public static readonly Coor Zero = new(0, 0);
-    public static readonly Coor One = new(1, 1);
+    public static readonly Coor<T> Zero = new(T.Zero, T.Zero);
+    public static readonly Coor<T> One = new(T.One, T.One);
 
-    public static readonly Coor Up = new(-1, 0);
-    public static readonly Coor Down = new(1, 0);
-    public static readonly Coor Left = new(0, -1);
-    public static readonly Coor Right = new(0, 1);
+    public static readonly Coor<T> Up = new(-T.One, T.Zero);
+    public static readonly Coor<T> Down = new(T.One, T.Zero);
+    public static readonly Coor<T> Left = new(T.Zero, -T.One);
+    public static readonly Coor<T> Right = new(T.Zero, T.One);
 
-    public static Coor operator -(Coor me, Coor other) => new(Y: me.Y - other.Y, X: me.X - other.X);
-    public static Coor operator +(Coor me, Coor other) => new(Y: me.Y + other.Y, X: me.X + other.X);
+    public static Coor<T> operator -(Coor<T> me, Coor<T> other) => new(Y: me.Y - other.Y, X: me.X - other.X);
+    public static Coor<T> operator +(Coor<T> me, Coor<T> other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
-    public bool InBoundsOf<T>(T[,] array)
-        => Y >= 0 && Y < array.GetLength(0) && X >= 0 && X < array.GetLength(1);
-
-    public static readonly Coor[] FourWayNeighbours =
+    public static readonly Coor<T>[] FourWayNeighbours =
     [
-        new (-1, 0),
-        new (0, -1),
-        new (0, 1),
-        new (1, 0),
+        new (-T.One, T.Zero),
+        new (T.Zero, -T.One),
+        new (T.Zero, T.One),
+        new (T.One, T.Zero),
     ];
 
-    public static readonly Coor[] Directions =
+    public static readonly Coor<T>[] Directions =
     [
         Right,
         Down,
@@ -35,36 +34,54 @@ public record Coor(int Y, int X)
         Up,
     ];
 
-    public static readonly Coor[] NineWayNeighbours =
+    public static readonly Coor<T>[] NineWayNeighbours =
     [
-        new(-1, -1),
-        new(-1, 0),
-        new(-1, 1),
-        new(0, -1),
-        new(0, 1),
-        new(1, -1),
-        new(1, 0),
-        new(1, 1),
+        new(-T.One, -T.One),
+        new(-T.One, T.Zero),
+        new(-T.One, T.One),
+        new(T.Zero, -T.One),
+        new(T.Zero, T.One),
+        new(T.One, -T.One),
+        new(T.One, T.Zero),
+        new(T.One, T.One),
     ];
 
-    public static bool operator ==(Coor me, (int, int) other) => new Coor(other.Item1, other.Item2) == me;
-    public static bool operator !=(Coor me, (int, int) other) => !(me == other);
-    public static Coor operator +(Coor me, (int, int) other) => new(Y: me.Y + other.Item1, X: me.X + other.Item2);
-    public static Coor operator -(Coor me, (int, int) other) => new(Y: me.Y - other.Item1, X: me.X - other.Item2);
+    public static bool operator ==(Coor<T> me, (T, T) other) => new Coor<T>(other.Item1, other.Item2) == me;
+    public static bool operator !=(Coor<T> me, (T, T) other) => !(me == other);
+    public static Coor<T> operator +(Coor<T> me, (T, T) other) => new(Y: me.Y + other.Item1, X: me.X + other.Item2);
+    public static Coor<T> operator -(Coor<T> me, (T, T) other) => new(Y: me.Y - other.Item1, X: me.X - other.Item2);
 
-    public static int ManhattanDistance(Coor me, Coor other) => Math.Abs(me.Y - other.Y) + Math.Abs(me.X - other.X);
+    public static T ManhattanDistance(Coor<T> me, Coor<T> other)
+    {
+        var y = me.Y - other.Y;
+        if (y < T.Zero)
+        {
+            y *= -T.One;
+        }
 
-    public int ManhattanDistance(Coor other) => ManhattanDistance(this, other);
+        var x = me.X - other.X;
+        if (x < T.Zero)
+        {
+            x *= -T.One;
+        }
+
+        return x + y;
+    }
+
+    public T ManhattanDistance(Coor<T> other) => ManhattanDistance(this, other);
 
     public override string ToString() => $"[{Y},{X}]";
 }
 
 public static class CoorExtensions
 {
-    public static void Visualize(this ICollection<Coor> coors, Coor? min, Coor? max)
+    public static bool InBoundsOf<R>(this Coor<int> coor, R[,] array)
+        => coor.Y >= 0 && coor.Y < array.GetLength(0) && coor.X >= 0 && coor.X < array.GetLength(1);
+
+    public static void Visualize(this ICollection<Coor<int>> coors, Coor<int>? min, Coor<int>? max)
     {
-        min ??= new Coor(coors.Min(c => c.Y), coors.Min(c => c.X));
-        max ??= new Coor(coors.Max(c => c.Y), coors.Max(c => c.X));
+        min ??= new Coor<int>(coors.Min(c => c.Y), coors.Min(c => c.X));
+        max ??= new Coor<int>(coors.Max(c => c.Y), coors.Max(c => c.X));
 
         var width = max.X - min.X + 1;
         var height = max.Y - min.Y + 1;
@@ -80,7 +97,7 @@ public static class CoorExtensions
         }
     }
 
-    public static void Print(this char[,] map, Func<Coor, char?>? printOverride = null)
+    public static void Print(this char[,] map, Func<Coor<int>, char?>? printOverride = null)
     {
         for (var y = 0; y < map.GetLength(0); y++)
         {
@@ -94,9 +111,9 @@ public static class CoorExtensions
         }
     }
 
-    public static T Get<T>(this T[,] items, Coor coor)
+    public static T Get<T>(this T[,] items, Coor<int> coor)
         => items[coor.Y, coor.X];
     
-    public static T Set<T>(this T[,] items, Coor coor, T value)
+    public static T Set<T>(this T[,] items, Coor<int> coor, T value)
         => items[coor.Y, coor.X] = value;
 }
