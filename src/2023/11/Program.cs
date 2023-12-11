@@ -1,18 +1,16 @@
 ﻿using AdventOfCode.Common;
 
-using Coor = AdventOfCode.Common.Coor<long>;
-
 bool[,] map = Resources.GetInputFileLines()
     .ParseAsArray(c => c == '#');
 
 var rows = map.GetLength(0);
 var cols = map.GetLength(1);
 
-List<Coor> stars =
+List<Coor<long>> stars =
     [.. from row in Enumerable.Range(0, rows)
     from col in Enumerable.Range(0, cols)
     where map[row, col]
-    select new Coor(row, col)];
+    select new Coor<long>(row, col)];
 
 var part1sum = stars
     .AllCombinations(includeIdentities: false, orderSensitive: false)

@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using AdventOfCode.Common;
+using Coor = AdventOfCode.Common.Coor<int>;
 
 namespace AdventOfCode._2021_20;
 

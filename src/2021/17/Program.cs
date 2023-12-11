@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var input = Resources.GetInputFileLines().First();
 
 var coordinates = input

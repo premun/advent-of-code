@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var rockDefinitions = Resources.GetInputFileLines()
     .Select(l => l.Split(" -> "))
     .Select(l => l.Select(c => c.Split(',')))

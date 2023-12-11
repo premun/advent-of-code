@@ -1,6 +1,8 @@
 ﻿using System.Text.RegularExpressions;
 using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var inputRegex = new Regex(@"Sensor at x=(?<sX>-?\d+), y=(?<sY>-?\d+): closest beacon is at x=(?<bX>-?\d+), y=(?<bY>-?\d+)");
 
 var sensors = Resources.GetInputFileLines()

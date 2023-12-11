@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var map = Resources.GetInputFileLines().ParseAsJaggedArray(c => c == '#');
 
 static int CountTrees(bool[][] map, Coor change)

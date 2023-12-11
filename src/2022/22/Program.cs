@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var map = Resources.GetInputFileContent()
     .Split(Environment.NewLine)
     .Select(s => s.PadRight(150, ' '))

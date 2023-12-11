@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 char[,] map = Resources.GetInputFileLines().ParseAsArray(c => c);
 
 Coor Find(char c) =>

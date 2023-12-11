@@ -1,6 +1,8 @@
 ﻿using AdventOfCode._2021_13;
 using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var lines = Resources.GetInputFileLines();
 
 var points = new HashSet<Coor>();

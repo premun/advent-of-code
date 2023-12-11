@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var trees = Resources.GetInputFileLines().ParseAsArray(c => c - '0');
 
 var topDown = Enumerable.Range(0, trees.GetLength(0)).ToArray();

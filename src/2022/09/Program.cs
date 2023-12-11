@@ -1,5 +1,7 @@
 ﻿using AdventOfCode.Common;
 
+using Coor = AdventOfCode.Common.Coor<int>;
+
 var moves = Resources.GetInputFileLines();
 
 static Coor FollowHead(Coor head, Coor tail)
