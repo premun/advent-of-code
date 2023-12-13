@@ -73,9 +73,11 @@ public static class Resources
     public static T[][] ParseAsJaggedArray<T>(this IEnumerable<string> input, Func<char, T> parser)
         => input.Select(line => line.Select(c => parser(c)).ToArray()).ToArray();
 
-    public static char[,] ParseAsArray(this IEnumerable<string> input) => ParseAsArray(input, c => c);
+    public static char[,] ParseAsArray(this IEnumerable<string> input)
+        => ParseAsArray(input, c => c);
 
-    public static char[][] ParseAsJaggedArray(this IEnumerable<string> input) => ParseAsJaggedArray(input, c => c);
+    public static char[][] ParseAsJaggedArray(this IEnumerable<string> input)
+        => ParseAsJaggedArray(input, c => c);
 
     public static List<int> ParseNumbersOut(this string line)
         => NumberPattern.Matches(line)
@@ -86,6 +88,18 @@ public static class Resources
         => NumberPattern.Matches(line)
             .Select(m => long.Parse(m.Value))
             .ToList();
+
+    public static int BitsToInt(this IEnumerable<bool> bools, bool lowestBitFirst = true)
+    {
+        if (lowestBitFirst)
+        {
+            bools = bools.Reverse();
+        }
+
+        return bools
+            .Select((b, index) => b ? 1 << index : 0)
+            .Aggregate(0, (acc, v) => acc |= v);
+    }
 
     public static IEnumerable<IEnumerable<T>> GroupsOf<T>(this IEnumerable<T> input, int groupSize)
     {
