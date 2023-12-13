@@ -1,4 +1,5 @@
 ﻿using AdventOfCode.Common;
+using GetVectors = System.Func<int, int, int, (System.Collections.Generic.IEnumerable<bool>, System.Collections.Generic.IEnumerable<bool>)>;
 
 var patterns = Resources.GetInputFileContent()
     .SplitBy(Environment.NewLine + Environment.NewLine)
@@ -6,56 +7,58 @@ var patterns = Resources.GetInputFileContent()
     .Select(pattern => pattern.ParseAsArray(c => c == '#'))
     .ToList();
 
-var result = 0;
-foreach (var pattern in patterns)
+Console.WriteLine($"Part 1: {FindReflections(patterns, numOfSmudges: 0)}");
+Console.WriteLine($"Part 2: {FindReflections(patterns, numOfSmudges: 1)}");
+
+static int FindReflections(List<bool[,]> patterns, int numOfSmudges)
 {
-    var height = pattern.GetLength(0);
-    var width = pattern.GetLength(1);
-
-    var reflectedRow = GetReflection(width, height, (int row, int col, int size) =>
-        (Enumerable.Range(0, size).Select(i => pattern[row + i, col]).BitsToInt(),
-         Enumerable.Range(1, size).Select(i => pattern[row - i, col]).BitsToInt()));
-
-    if (reflectedRow.HasValue)
+    var result = 0;
+    foreach (var pattern in patterns)
     {
-        result += 100 * reflectedRow.Value;
-    }
-    else
-    {
-        var reflectedCol = GetReflection(height, width, (int col, int row, int size) =>
-            (Enumerable.Range(0, size).Select(i => pattern[row, col + i]).BitsToInt(),
-             Enumerable.Range(1, size).Select(i => pattern[row, col - i]).BitsToInt()));
+        var height = pattern.GetLength(0);
+        var width = pattern.GetLength(1);
 
-        if (reflectedCol.HasValue)
+        var reflectedRow = GetReflectionPoint(width, height, numOfSmudges, (int row, int col, int size) =>
+            (Enumerable.Range(0, size).Select(i => pattern[row + i, col]),
+             Enumerable.Range(1, size).Select(i => pattern[row - i, col])));
+
+        if (reflectedRow.HasValue)
         {
-            result += reflectedCol.Value;
+            result += 100 * reflectedRow.Value;
         }
         else
         {
-            throw new Exception("No reflection found for pattern");
+            var reflectedCol = GetReflectionPoint(height, width, numOfSmudges, (int col, int row, int size) =>
+                (Enumerable.Range(0, size).Select(i => pattern[row, col + i]),
+                 Enumerable.Range(1, size).Select(i => pattern[row, col - i])));
+
+            result += reflectedCol ?? throw new Exception("No reflection found for pattern");
         }
     }
+
+    return result;
 }
 
-Console.WriteLine($"Part 1: {result}");
-
-static int? GetReflection(int width, int height, Func<int, int, int, (int, int)> getReflections)
+static int? GetReflectionPoint(int width, int height, int numOfSmudges, GetVectors getReflections)
 {
-    for (int dim1 = 1; dim1 < height; dim1++)
+    for (int row = 1; row < height; row++)
     {
-        var isReflection = Enumerable.Range(0, width)
-            .All(dim2 =>
+        var differences = Enumerable.Range(0, width)
+            .Sum(col =>
             {
-                var size = Math.Min(dim1, height - dim1);
-                var (a, b) = getReflections(dim1, dim2, size);
-                return a == b;
+                var size = Math.Min(row, height - row);
+                var (a, b) = getReflections(row, col, size);
+                return GetDifferences(a, b);
             });
 
-        if (isReflection)
+        if (differences == numOfSmudges)
         {
-            return dim1;
+            return row;
         }
     }
 
     return null;
 }
+
+static int GetDifferences(IEnumerable<bool> a, IEnumerable<bool> b)
+    => a.Zip(b).Count(p => p.First != p.Second);
