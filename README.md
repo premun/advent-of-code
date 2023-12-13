@@ -13,6 +13,7 @@
 | [Day 8](https://adventofcode.com/2023/day/8) | ⭐ | ⭐ |
 | [Day 9](https://adventofcode.com/2023/day/9) | ⭐ | ⭐ |
 | [Day 11](https://adventofcode.com/2023/day/11) | ⭐ | ⭐ |
+| [Day 13](https://adventofcode.com/2023/day/13) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
 ## 2022 Results
 
