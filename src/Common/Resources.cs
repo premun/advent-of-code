@@ -89,6 +89,18 @@ public static class Resources
             .Select(m => long.Parse(m.Value))
             .ToList();
 
+    public static T[,] InitializeWith<T>(this T[,] array, T value)
+    {
+        var h = array.GetLength(0);
+        var w = array.GetLength(1);
+        for (int i = 0; i < h * w; i++)
+        {
+            array[i % h, i / h] = value;
+        }
+
+        return array;
+    }
+
     public static int BitsToInt(this IEnumerable<bool> bools, bool lowestBitFirst = true)
     {
         if (lowestBitFirst)
