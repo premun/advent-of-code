@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Common;
@@ -101,10 +102,32 @@ public static class Resources
         return array;
     }
 
-    public static IEnumerable<Coor<int>> AllCoordinates<T>(this T[,] array) =>
-        from row in Enumerable.Range(0, array.GetLength(0))
-        from col in Enumerable.Range(0, array.GetLength(1))
-        select new Coor<int>(row, col);
+    public static IEnumerable<Coor<int>> AllCoordinates<T>(this T[,] array)
+    {
+        for (int i = 0; i < array.GetLength(0) * array.GetLength(1); i++)
+        {
+            yield return new Coor<int>(i % array.GetLength(0), i / array.GetLength(0));
+        }
+    }
+
+    public static void ForEach<T>(this T[,] array, Action<int, int, T> action)
+    {
+        for (int row = 0; row < array.GetLength(0); row++)
+            for (int col = 0; col < array.GetLength(1); col++)
+                action(row, col, array[row, col]);
+    }
+
+    public static string ToFlatString(this char[,] array)
+    {
+        var h = array.GetLength(0);
+        var w = array.GetLength(1);
+        var result = new StringBuilder(h * w);
+        for (int i = 0; i < h * w; i++)
+        {
+            result.Append(array[i % h, i / h]);
+        }
+        return result.ToString();
+    }
 
     public static int BitsToInt(this IEnumerable<bool> bools, bool lowestBitFirst = true)
     {
