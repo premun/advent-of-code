@@ -101,6 +101,11 @@ public static class Resources
         return array;
     }
 
+    public static IEnumerable<Coor<int>> AllCoordinates<T>(this T[,] array) =>
+        from row in Enumerable.Range(0, array.GetLength(0))
+        from col in Enumerable.Range(0, array.GetLength(1))
+        select new Coor<int>(row, col);
+
     public static int BitsToInt(this IEnumerable<bool> bools, bool lowestBitFirst = true)
     {
         if (lowestBitFirst)
