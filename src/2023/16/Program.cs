@@ -6,7 +6,7 @@ var map = Resources.GetInputFileLines().ParseAsArray();
 var height = map.GetLength(0);
 var width = map.GetLength(1);
 
-int[] results =
+int[] allScores =
 [
     .. Enumerable.Range(0, height).Select(row => SimulateRays(new Coor(row, -1), Coor.Right)),
     .. Enumerable.Range(0, height).Select(row => SimulateRays(new Coor(row, width), Coor.Left)),
@@ -15,7 +15,7 @@ int[] results =
 ];
 
 Console.WriteLine($"Part 1: {SimulateRays(new Coor(0, -1), Coor.Right)}");
-Console.WriteLine($"Part 2: {results.Max()}");
+Console.WriteLine($"Part 2: {allScores.Max()}");
 
 int SimulateRays(Coor startPosition, Coor startDirection)
 {
@@ -101,6 +101,7 @@ int SimulateRays(Coor startPosition, Coor startDirection)
         }
     }
 
+    // map.Print(c => energized.Get(c) ? '#' : null);
     return result;
 }
 
