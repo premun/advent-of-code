@@ -1,4 +1,5 @@
 ﻿using AdventOfCode.Common;
+using Common;
 using GetVectors = System.Func<int, int, int, (System.Collections.Generic.IEnumerable<bool>, System.Collections.Generic.IEnumerable<bool>)>;
 
 var patterns = Resources.GetInputFileContent()
@@ -15,8 +16,8 @@ static int FindReflections(List<bool[,]> patterns, int numOfSmudges)
     var result = 0;
     foreach (var pattern in patterns)
     {
-        var height = pattern.GetLength(0);
-        var width = pattern.GetLength(1);
+        var height = pattern.Height();
+        var width = pattern.Width();
 
         var reflectedRow = GetReflectionPoint(width, height, numOfSmudges, (int row, int col, int size) =>
             (Enumerable.Range(0, size).Select(i => pattern[row + i, col]),

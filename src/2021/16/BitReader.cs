@@ -1,15 +1,10 @@
 ﻿namespace AdventOfCode._2021_16;
 
-class BitReader
+class BitReader(string source)
 {
-    private readonly string _source;
+    private readonly string _source = ToBits(source);
 
     public int Position { get; private set; } = 0;
-
-    public BitReader(string source)
-    {
-        _source = ToBits(source);
-    }
 
     public bool ReadBit() => _source[Position++] == '1';
 

@@ -9,18 +9,13 @@ enum Token
     EndOfStream,
 }
 
-class TokenReader
+class TokenReader(string source)
 {
-    private readonly string _source;
+    private readonly string _source = source;
 
     public int Position { get; private set; } = 0;
 
     public bool EndOfStream => Position == _source.Length;
-
-    public TokenReader(string source)
-    {
-        _source = source;
-    }
 
     public Token GetNext(out long literalValue)
     {

@@ -2,22 +2,14 @@
 
 namespace AdventOfCode._2021_21;
 
-class QuantumDiracDiceGame : DiracDiceGame
+class QuantumDiracDiceGame(int maxPosition, int winningPoints, int diceSides) : DiracDiceGame(maxPosition)
 {
-    private readonly int _maxPosition;
-    private readonly int _winningPoints;
-    private readonly int _diceSides;
+    private readonly int _maxPosition = maxPosition;
+    private readonly int _winningPoints = winningPoints;
+    private readonly int _diceSides = diceSides;
 
     // Map where keys are possible sums of 3 dice rolls and values counts of combinations that have that value
-    private readonly ReadOnlyCollection<(int Value, int Count)> _diceRolls;
-
-    public QuantumDiracDiceGame(int maxPosition, int winningPoints, int diceSides) : base(maxPosition)
-    {
-        _maxPosition = maxPosition;
-        _winningPoints = winningPoints;
-        _diceSides = diceSides;
-        _diceRolls = GeneratePossibleDiceRolls(diceSides);
-    }
+    private readonly ReadOnlyCollection<(int Value, int Count)> _diceRolls = GeneratePossibleDiceRolls(diceSides);
 
     public long RunGame(int player1Position, int player2Position, bool firstPlayerStarts)
     {

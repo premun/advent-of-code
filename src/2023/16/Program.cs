@@ -1,10 +1,11 @@
 ﻿using AdventOfCode.Common;
+using Common;
 using Coor = AdventOfCode.Common.Coor<int>;
 
 var map = Resources.GetInputFileLines().ParseAsArray();
 
-var height = map.GetLength(0);
-var width = map.GetLength(1);
+var height = map.Height();
+var width = map.Width();
 
 int[] allScores =
 [
@@ -19,8 +20,8 @@ Console.WriteLine($"Part 2: {allScores.Max()}");
 
 int SimulateRays(Coor startPosition, Coor startDirection)
 {
-    var energized = new bool[map!.GetLength(0), map.GetLength(1)];
-    var used = new bool[map.GetLength(0), map.GetLength(1)];
+    var energized = new bool[map!.Height(), map.Width()];
+    var used = new bool[map.Height(), map.Width()];
 
     var rays = new Queue<Ray>([new Ray(startPosition, startDirection)]);
     int result = 0;

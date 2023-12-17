@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace AdventOfCode.Common;
@@ -7,7 +6,7 @@ namespace AdventOfCode.Common;
 public static class Resources
 {
     private const string DefaultInputName = "input.txt";
-    private static readonly Regex NumberPattern = new(@"\-?\d+");
+    private static readonly Regex s_numberPattern = new(@"\-?\d+");
 
     public static string[] GetInputFileLines(string resourceFileName = DefaultInputName)
         => GetResourceFileContent(Assembly.GetCallingAssembly(), resourceFileName).SplitBy(Environment.NewLine);
@@ -81,53 +80,14 @@ public static class Resources
         => ParseAsJaggedArray(input, c => c);
 
     public static List<int> ParseNumbersOut(this string line)
-        => NumberPattern.Matches(line)
+        => s_numberPattern.Matches(line)
             .Select(m => int.Parse(m.Value))
             .ToList();
 
     public static List<long> ParseLongNumbersOut(this string line)
-        => NumberPattern.Matches(line)
+        => s_numberPattern.Matches(line)
             .Select(m => long.Parse(m.Value))
             .ToList();
-
-    public static T[,] InitializeWith<T>(this T[,] array, T value)
-    {
-        var h = array.GetLength(0);
-        var w = array.GetLength(1);
-        for (int i = 0; i < h * w; i++)
-        {
-            array[i % h, i / h] = value;
-        }
-
-        return array;
-    }
-
-    public static IEnumerable<Coor<int>> AllCoordinates<T>(this T[,] array)
-    {
-        for (int i = 0; i < array.GetLength(0) * array.GetLength(1); i++)
-        {
-            yield return new Coor<int>(i % array.GetLength(0), i / array.GetLength(0));
-        }
-    }
-
-    public static void ForEach<T>(this T[,] array, Action<int, int, T> action)
-    {
-        for (int row = 0; row < array.GetLength(0); row++)
-            for (int col = 0; col < array.GetLength(1); col++)
-                action(row, col, array[row, col]);
-    }
-
-    public static string ToFlatString(this char[,] array)
-    {
-        var h = array.GetLength(0);
-        var w = array.GetLength(1);
-        var result = new StringBuilder(h * w);
-        for (int i = 0; i < h * w; i++)
-        {
-            result.Append(array[i % h, i / h]);
-        }
-        return result.ToString();
-    }
 
     public static int BitsToInt(this IEnumerable<bool> bools, bool lowestBitFirst = true)
     {

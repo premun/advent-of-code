@@ -7,7 +7,7 @@ var seats = Resources.GetInputFileContent()
     .Replace("L", "0")
     .SplitBy(Environment.NewLine)
     .Select(number => (Row: Convert.ToInt32(number.Substring(0, 7), 2), Column: Convert.ToInt32(number.Substring(7), 2)))
-    .Select(s => (Row: s.Row, Column: s.Column, Id: s.Row * 8 + s.Column))
+    .Select(s => (s.Row, s.Column, Id: s.Row * 8 + s.Column))
     .OrderBy(s => s.Id)
     .ToList();
 

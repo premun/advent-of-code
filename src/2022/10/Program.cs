@@ -6,20 +6,14 @@ system.RunCommands(commands);
 
 Console.WriteLine($"Part 1: {system.Signal}");
 
-class CommunicationSystem
+class CommunicationSystem(int displayWidth, IEnumerable<int> importantCycles)
 {
-    private readonly int _displayWidth;
-    private readonly Queue<int> _importantCycles;
+    private readonly int _displayWidth = displayWidth;
+    private readonly Queue<int> _importantCycles = new(importantCycles);
     private int _register;
     private int _cycle;
 
     public int Signal { get; private set; }
-
-    public CommunicationSystem(int displayWidth, IEnumerable<int> importantCycles)
-    {
-        _displayWidth = displayWidth;
-        _importantCycles = new(importantCycles);
-    }
 
     public void RunCommands(IEnumerable<string> commands)
     {

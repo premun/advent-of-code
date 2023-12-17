@@ -5,18 +5,11 @@ class Basin
     public int Size { get; set; }
 }
 
-class BasinMap
+class BasinMap(int[][] heatMap)
 {
-    private readonly int[][] _heatMap;
-    private readonly Basin[,] _basinMap;
-    private readonly List<Basin> _basins;
-
-    public BasinMap(int[][] heatMap)
-    {
-        _heatMap = heatMap;
-        _basinMap = new Basin[heatMap.Length, heatMap[0].Length];
-        _basins = [];
-    }
+    private readonly int[][] _heatMap = heatMap;
+    private readonly Basin[,] _basinMap = new Basin[heatMap.Length, heatMap[0].Length];
+    private readonly List<Basin> _basins = [];
 
     public IEnumerable<Basin> FindBasins()
     {

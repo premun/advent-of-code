@@ -1,15 +1,10 @@
 ﻿namespace AdventOfCode._2021_18;
 
-class Literal : SnailfishNumber
+class Literal(long value) : SnailfishNumber
 {
     public override long Magnitude => Value;
 
-    public long Value { get; set; }
-
-    public Literal(long value)
-    {
-        Value = value;
-    }
+    public long Value { get; set; } = value;
 
     internal override bool TryExplode(int depth) => false;
 

@@ -1,11 +1,6 @@
 ﻿namespace AdventOfCode._2020_08;
 
-class ProgramLoopException : Exception
+class ProgramLoopException(int accumulatorValue) : Exception
 {
-    public int AccumulatorValue { get; }
-
-    public ProgramLoopException(int accumulatorValue)
-    {
-        AccumulatorValue = accumulatorValue;
-    }
+    public int AccumulatorValue { get; } = accumulatorValue;
 }

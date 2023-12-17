@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Common;
 
 namespace AdventOfCode.Common;
 
@@ -18,20 +19,20 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
     public static Coor<T> operator -(Coor<T> me, Coor<T> other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor<T> operator +(Coor<T> me, Coor<T> other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
-    public static readonly Coor<T>[] FourWayNeighbours =
-    [
-        new (-T.One, T.Zero),
-        new (T.Zero, -T.One),
-        new (T.Zero, T.One),
-        new (T.One, T.Zero),
-    ];
-
     public static readonly Coor<T>[] Directions =
     [
         Right,
         Down,
         Left,
         Up,
+    ];
+
+    public static readonly Coor<T>[] FourWayNeighbours =
+    [
+        new (-T.One, T.Zero),
+        new (T.Zero, -T.One),
+        new (T.Zero, T.One),
+        new (T.One, T.Zero),
     ];
 
     public static readonly Coor<T>[] NineWayNeighbours =
@@ -45,6 +46,15 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
         new(T.One, T.Zero),
         new(T.One, T.One),
     ];
+
+    public IEnumerable<Coor<T>> GetFourWayNeighbours()
+        => FourWayNeighbours.Select(c => this + c);
+
+    public bool IsOpposite(Coor<T> other) =>
+        (this == Coor<T>.Right && other == Coor<T>.Left)
+        || (this == Coor<T>.Left && other == Coor<T>.Right)
+        || (this == Coor<T>.Up && other == Coor<T>.Down)
+        || (this == Coor<T>.Down && other == Coor<T>.Up);
 
     public static bool operator ==(Coor<T> me, (T, T) other) => new Coor<T>(other.Item1, other.Item2) == me;
     public static bool operator !=(Coor<T> me, (T, T) other) => !(me == other);
@@ -76,7 +86,7 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
 public static class CoorExtensions
 {
     public static bool InBoundsOf<R>(this Coor<int> coor, R[,] array)
-        => coor.Y >= 0 && coor.Y < array.GetLength(0) && coor.X >= 0 && coor.X < array.GetLength(1);
+        => coor.Y >= 0 && coor.Y < array.Height() && coor.X >= 0 && coor.X < array.Width();
 
     public static void Visualize(this ICollection<Coor<int>> coors, Coor<int>? min, Coor<int>? max)
     {
@@ -99,9 +109,9 @@ public static class CoorExtensions
 
     public static void Print(this char[,] map, Func<Coor<int>, char?>? printOverride = null)
     {
-        for (var y = 0; y < map.GetLength(0); y++)
+        for (var y = 0; y < map.Height(); y++)
         {
-            for (var x = 0; x < map.GetLength(1); x++)
+            for (var x = 0; x < map.Width(); x++)
             {
                 var c = printOverride?.Invoke(new(y, x)) ?? map[y, x];
                 Console.Write(c);

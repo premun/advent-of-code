@@ -42,7 +42,7 @@ var scenicScores =
 Console.WriteLine($"Part 1: {visibleTrees.Distinct().Count()}");
 Console.WriteLine($"Part 2: {scenicScores.Max()}");
 
-public static class Trees
+static file class Trees
 {
     public static IEnumerable<(int, int)> AllVisible(this IEnumerable<(int, int)> treeLine, int[,] trees)
     {

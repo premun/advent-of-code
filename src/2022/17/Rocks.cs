@@ -2,19 +2,12 @@
 
 namespace AdventOfCode._2022_17;
 
-abstract class Rock
+abstract class Rock(IReadOnlyCollection<Coor> positions)
 {
-    public int Height { get; }
-    public int Width { get; }
+    public int Height { get; } = positions.Max(p => p.Y) + 1;
+    public int Width { get; } = positions.Max(p => p.X) - 1;
 
-    public IReadOnlyCollection<Coor> Positions { get; set; }
-
-    public Rock(IReadOnlyCollection<Coor> positions)
-    {
-        Positions = positions;
-        Height = positions.Max(p => p.Y) + 1;
-        Width = positions.Max(p => p.X) - 1;
-    }
+    public IReadOnlyCollection<Coor> Positions { get; set; } = positions;
 }
 
 class RowRock : Rock

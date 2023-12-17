@@ -1,4 +1,5 @@
 ﻿using AdventOfCode.Common;
+using Common;
 using Coor = AdventOfCode.Common.Coor<int>;
 
 char[,] pipes = Resources.GetInputFileLines().ParseAsArray();
@@ -24,8 +25,8 @@ var connections = new Dictionary<char, bool[]>
     ['S'] = [ true,  true,  true,  true],
 };
 
-var width = pipes.GetLength(1);
-var height = pipes.GetLength(0);
+var width = pipes.Width();
+var height = pipes.Height();
 
 var start =
     (from row in Enumerable.Range(0, height)

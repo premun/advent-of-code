@@ -6,17 +6,11 @@ class Player
     public int Points { get; set; }
 }
 
-class SimpleDiracDiceGame : DiracDiceGame
+class SimpleDiracDiceGame(IDice dice, int maxPosition, int winningPoints) : DiracDiceGame(maxPosition)
 {
-    private readonly IDice _dice;
-    private readonly int _winningPoints;
+    private readonly IDice _dice = dice;
+    private readonly int _winningPoints = winningPoints;
     private int _currentPlayer = 0;
-
-    public SimpleDiracDiceGame(IDice dice, int maxPosition, int winningPoints) : base(maxPosition)
-    {
-        _dice = dice;
-        _winningPoints = winningPoints;
-    }
 
     public Player[] RunGame(int[] startingPosition)
     {

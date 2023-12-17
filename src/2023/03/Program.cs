@@ -1,12 +1,13 @@
 ﻿using AdventOfCode.Common;
+using Common;
 
 char[,] map = Resources.GetInputFileLines().ParseAsArray();
 var symbols = new List<Symbol>();
 var numbers = new List<Number>();
 
-for (int row = 0; row < map.GetLength(1); row++)
+for (int row = 0; row < map.Width(); row++)
 {
-    for (int col = 0; col < map.GetLength(0); col++)
+    for (int col = 0; col < map.Height(); col++)
     {
         var c = map[row, col];
         switch (c)
@@ -16,7 +17,7 @@ for (int row = 0; row < map.GetLength(1); row++)
 
             case >= '0' and <= '9':
                 var number = new Number(c - '0', row, col, col);
-                while (++col < map.GetLength(0) && char.IsDigit(map[row, col]))
+                while (++col < map.Height() && char.IsDigit(map[row, col]))
                 {
                     number = new Number(number.Value * 10 + map[row, col] - '0', number.Row, number.Col, col);
                 }

@@ -53,7 +53,7 @@ for (int i = 0; i < instructions.Length; i++)
                 1 => GetFirstEmptyRow(position.Col, inBounds ? newPosition.Row : 0),
                 2 => GetLastEmptyCol(position.Row, inBounds ? newPosition.Col : 0),
                 3 => GetLastEmptyRow(position.Col, inBounds ? newPosition.Row : 0),
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new Exception()
             };
         }
 

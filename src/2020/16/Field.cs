@@ -2,17 +2,11 @@
 
 namespace AdventOfCode._2020_16;
 
-class Field
+class Field(string name, ReadOnlyCollection<(int Min, int Max)> intervals)
 {
-    public string Name { get; }
+    public string Name { get; } = name;
 
-    public ReadOnlyCollection<(int Min, int Max)> Intervals { get; }
-
-    public Field(string name, ReadOnlyCollection<(int Min, int Max)> intervals)
-    {
-        Name = name;
-        Intervals = intervals;
-    }
+    public ReadOnlyCollection<(int Min, int Max)> Intervals { get; } = intervals;
 
     public bool Includes(int number)
     {

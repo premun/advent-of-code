@@ -2,17 +2,11 @@
 
 namespace AdventOfCode._2021_04;
 
-class Board
+class Board(int[,] numbers)
 {
     private const int Size = 5;
-    private readonly int[,] _numbers;
-    private bool[,] _crossed;
-
-    public Board(int[,] numbers)
-    {
-        _numbers = numbers;
-        _crossed = new bool[Size, Size];
-    }
+    private readonly int[,] _numbers = numbers;
+    private bool[,] _crossed = new bool[Size, Size];
 
     public bool CrossNumber(int number)
     {

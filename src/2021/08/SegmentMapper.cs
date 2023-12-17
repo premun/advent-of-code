@@ -48,12 +48,8 @@ class SegmentMapper
             .OrderBy(digit => digit.Length is 2 or 3 or 4 or 7 ? -1 : 1) // Optimization
             .ToDictionary(d => d, d => FindMappings(d).ToHashSet());
 
-        var disallowedMappings = FindDisallowedMappings(orderedSignals, []);
-
-        if (disallowedMappings == null)
-        {
-            throw new Exception($"Unclear mappings for {string.Join(", ", signals)}");
-        }
+        var disallowedMappings = FindDisallowedMappings(orderedSignals, [])
+            ?? throw new Exception($"Unclear mappings for {string.Join(", ", signals)}");
 
         foreach (var c in s_segments)
         {

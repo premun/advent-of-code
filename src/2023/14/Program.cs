@@ -1,11 +1,12 @@
 ﻿using AdventOfCode.Common;
+using Common;
 using Coor = AdventOfCode.Common.Coor<int>;
 
 char[,] map = Resources.GetInputFileLines().ParseAsArray();
 const char O = 'O';
 
-var height = map.GetLength(0);
-var width = map.GetLength(1);
+var height = map.Height();
+var width = map.Width();
 
 Tilt(Coor.Up);
 

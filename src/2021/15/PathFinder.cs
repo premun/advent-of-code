@@ -2,18 +2,11 @@
 
 namespace AdventOfCode._2021_15;
 
-class PathFinder
+class PathFinder(int[][] map)
 {
-    private readonly int[][] _map;
-    private readonly int _maxY;
-    private readonly int _maxX;
-
-    public PathFinder(int[][] map)
-    {
-        _map = map;
-        _maxY = map.Length - 1;
-        _maxX = map[0].Length - 1;
-    }
+    private readonly int[][] _map = map;
+    private readonly int _maxY = map.Length - 1;
+    private readonly int _maxX = map[0].Length - 1;
 
     public int FindShortestPath()
     {

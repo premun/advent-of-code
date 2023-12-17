@@ -1,10 +1,11 @@
 ﻿using AdventOfCode.Common;
+using Common;
 
 bool[,] map = Resources.GetInputFileLines()
     .ParseAsArray(c => c == '#');
 
-var rows = map.GetLength(0);
-var cols = map.GetLength(1);
+var rows = map.Height();
+var cols = map.Width();
 
 List<Coor<long>> stars =
     [.. from row in Enumerable.Range(0, rows)

@@ -1,11 +1,6 @@
 ﻿namespace AdventOfCode._2021_10;
 
-class CorruptedLineException : Exception
+class CorruptedLineException(char c) : Exception
 {
-    public CorruptedLineException(char c)
-    {
-        CorruptedChar = c;
-    }
-
-    public char CorruptedChar { get; }
+    public char CorruptedChar { get; } = c;
 }

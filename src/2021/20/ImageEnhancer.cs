@@ -3,7 +3,7 @@ using Coor = AdventOfCode.Common.Coor<int>;
 
 namespace AdventOfCode._2021_20;
 
-class ImageEnhancer
+class ImageEnhancer(ReadOnlyCollection<bool> algorithm)
 {
     private static readonly IEnumerable<Coor> s_arounds = new Coor[]
     {
@@ -20,15 +20,10 @@ class ImageEnhancer
         new (1, 1),
     };
 
-    private readonly ReadOnlyCollection<bool> _algorithm;
+    private readonly ReadOnlyCollection<bool> _algorithm = algorithm;
 
     // Represents what colour is the inifinite surrounding
     private bool _surroundingColor = false;
-
-    public ImageEnhancer(ReadOnlyCollection<bool> algorithm)
-    {
-        _algorithm = algorithm;
-    }
 
     public bool[][] Enhance(bool[][] image)
     {
