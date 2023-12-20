@@ -44,4 +44,7 @@ public record Range(long Start, long End)
             yield return i;
         }
     }
+
+    public override string ToString()
+        => $"[{(Start == long.MinValue ? "-" : Start)}, {(End == long.MaxValue ? "+" : End)}]";
 }
