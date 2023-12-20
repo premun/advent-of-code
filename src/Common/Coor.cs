@@ -106,24 +106,4 @@ public static class CoorExtensions
             Console.WriteLine();
         }
     }
-
-    public static void Print(this char[,] map, Func<Coor<int>, char?>? printOverride = null)
-    {
-        for (var y = 0; y < map.Height(); y++)
-        {
-            for (var x = 0; x < map.Width(); x++)
-            {
-                var c = printOverride?.Invoke(new(y, x)) ?? map[y, x];
-                Console.Write(c);
-            }
-
-            Console.WriteLine();
-        }
-    }
-
-    public static T Get<T>(this T[,] items, Coor<int> coor)
-        => items[coor.Y, coor.X];
-    
-    public static T Set<T>(this T[,] items, Coor<int> coor, T value)
-        => items[coor.Y, coor.X] = value;
 }
