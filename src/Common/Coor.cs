@@ -19,7 +19,7 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
     public static Coor<T> operator -(Coor<T> me, Coor<T> other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor<T> operator +(Coor<T> me, Coor<T> other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
-    public static readonly Coor<T>[] Directions =
+    public static readonly IReadOnlyCollection<Coor<T>> Directions =
     [
         Right,
         Down,
@@ -27,15 +27,15 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
         Up,
     ];
 
-    public static readonly Coor<T>[] FourWayNeighbours =
+    public static readonly IReadOnlyCollection<Coor<T>> FourWayNeighbours =
     [
-        new (-T.One, T.Zero),
-        new (T.Zero, -T.One),
-        new (T.Zero, T.One),
-        new (T.One, T.Zero),
+        Right,
+        Down,
+        Left,
+        Up,
     ];
 
-    public static readonly Coor<T>[] NineWayNeighbours =
+    public static readonly IReadOnlyCollection<Coor<T>> NineWayNeighbours =
     [
         new(-T.One, -T.One),
         new(-T.One, T.Zero),
@@ -50,11 +50,7 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
     public IEnumerable<Coor<T>> GetFourWayNeighbours()
         => FourWayNeighbours.Select(c => this + c);
 
-    public bool IsOpposite(Coor<T> other) =>
-        (this == Coor<T>.Right && other == Coor<T>.Left)
-        || (this == Coor<T>.Left && other == Coor<T>.Right)
-        || (this == Coor<T>.Up && other == Coor<T>.Down)
-        || (this == Coor<T>.Down && other == Coor<T>.Up);
+    public bool IsOpposite(Coor<T> other) => (this + other) == Zero;
 
     public static bool operator ==(Coor<T> me, (T, T) other) => new Coor<T>(other.Item1, other.Item2) == me;
     public static bool operator !=(Coor<T> me, (T, T) other) => !(me == other);
