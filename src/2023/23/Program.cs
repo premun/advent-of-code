@@ -24,24 +24,54 @@ var directions = new Dictionary<char, Coor>
     { 'v', Coor.Down },
 };
 
-Dictionary<Coor<int>, Slope> slopes = map.AllCoordinates()
+Dictionary<Coor, Slope> slopes = map.AllCoordinates()
     .Where(coor => directions.ContainsKey(map.Get(coor)))
     .ToDictionary(c => c, c => new Slope(c, directions[map.Get(c)]));
 
 FindJunctions(start + Coor.Down, Coor.Down);
 
-Dictionary<Coor<int>, Junction> junctions = map.AllCoordinates()
+Dictionary<Coor, Junction> junctions = map.AllCoordinates()
     .Where(coor => map.Get(coor) == '+' || coor == start || coor == end)
     .ToDictionary(c => c, c => new Junction(c));
-
-Visualize();
 
 ConnectJunctions(junctions[start], start, Coor.Down, 0);
 
 Console.Clear();
 Visualize();
 
+Dictionary<Junction, int> distances = junctions
+    .ToDictionary(c => c.Value, c => 0);
 
+PriorityQueue<List<Junction>, int> queue = new(Comparer<int>.Create((a, b) => b.CompareTo(a)));
+queue.Enqueue([junctions[start]], 0);
+
+while (queue.TryDequeue(out var path, out int distance))
+{
+    var junction = path.Last();
+    if (distances[junction] > distance)
+    {
+        continue;
+    }
+
+    foreach (var neighbour in junction.Neighbours)
+    {
+        if (path.Contains(neighbour.Junction))
+        {
+            continue;
+        }
+
+        var newDistance = distance + neighbour.Distance;
+        if (distances[neighbour.Junction] > newDistance)
+        {
+            continue;
+        }
+
+        distances[neighbour.Junction] = newDistance;
+        queue.Enqueue([.. path, neighbour.Junction], newDistance);
+    }
+}
+
+Console.WriteLine(distances[junctions[end]]);
 
 // Walks the map adhering to rules and finds all junctions
 void FindJunctions(Coor position, Coor cameFromDirection)
@@ -76,8 +106,6 @@ void ConnectJunctions(Junction source, Coor position, Coor cameFromDirection, in
     var possibleDirections = GetPossibleDirections(position, cameFromDirection).ToList();
     foreach (var newDirection in possibleDirections)
     {
-        Visualize(new Coor(source.Y, source.X), position + newDirection);
-        Console.ReadLine();
         ConnectJunctions(source, position + newDirection, newDirection, distance + 1);
     }
 }
@@ -126,14 +154,12 @@ void Visualize(Coor? position1 = default, Coor? position2 = default)
     });
 }
 
-file record Slope(Coor position, Coor direction)
-     : Coor(position.Y, position.X)
+file record Slope(Coor position, Coor direction) : Coor(position.Y, position.X)
 {
     public Coor Direction { get; } = direction;
 }
 
-file record Junction(Coor position)
-    : Coor(position.Y, position.X)
+file record Junction(Coor position) : Coor(position.Y, position.X)
 {
     public List<(Junction Junction, int Distance)> Neighbours { get; } = [];
 }
