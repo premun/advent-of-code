@@ -1,8 +1,8 @@
-﻿using System.Drawing;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using AdventOfCode.Common;
 
 using Coor = AdventOfCode.Common.Coor<int>;
+using Range = AdventOfCode.Common.Range;
 
 var regex = new Regex(@"(?<direction>R|D|L|U) (?<distance>[0-9]+) \((?<color>#[0-9a-h]{6})\)");
 
@@ -19,73 +19,212 @@ var instructions = Resources.GetInputFileLines()
             _ => throw new Exception()
         },
         int.Parse(m.Groups["distance"].Value),
-        ColorTranslator.FromHtml(m.Groups["color"].Value)))
+        m.Groups["color"].Value))
     .ToList();
 
-List<Coor> trench = [];
+var borders = new List<Line>();
+var lastEnd = Coor.Zero;
 int minRow = int.MaxValue, minCol = int.MaxValue;
 int maxRow = int.MinValue, maxCol = int.MinValue;
 
 foreach (var instruction in instructions)
 {
-    var last = trench.LastOrDefault() ?? Coor.Zero - instructions[0].Direction;
-    for (var i = 0; i < instruction.Distance; i++)
-    {
-        last += instruction.Direction;
-        trench.Add(last);
+    var newEnd = lastEnd + new Coor(
+        instruction.Distance * instruction.Direction.Y,
+        instruction.Distance * instruction.Direction.X);
 
-        minRow = Math.Min(minRow, last.Row);
-        maxRow = Math.Max(maxRow, last.Row);
-        minCol = Math.Min(minCol, last.Col);
-        maxCol = Math.Max(maxCol, last.Col);
-    }
+    borders.Add(Line.Create(lastEnd, newEnd));
+    lastEnd = newEnd;
+
+    minRow = Math.Min(minRow, lastEnd.Row);
+    maxRow = Math.Max(maxRow, lastEnd.Row);
+    minCol = Math.Min(minCol, lastEnd.Col);
+    maxCol = Math.Max(maxCol, lastEnd.Col);
 }
 
-// Make everything start at 1,1
-if (Coor.Zero != (minRow, minCol))
+var verticals = borders
+    .OfType<VerticalLine>()
+    .OrderBy(b => b.Start.Col)
+    .ToList();
+
+var horizontals = borders
+    .OfType<HorizontalLine>()
+    .OrderBy(b => b.Start.Row)
+    .ToList();
+
+var horizontalMatches = new List<Range>[maxRow - minRow + 1];
+for (int row = minRow; row <= maxRow; row++)
 {
-    trench = trench
-        .Select(c => c - (minRow, minCol) + (1, 1))
-        .ToList();
-}
+    var rowMatches = new List<Range>();
 
-// Make an additional row/col around the trench
-var map = new char[maxRow - minRow + 3, maxCol - minCol + 3]
-    .InitializeWith('.');
+    var inside = false;
+    var start = 0;
+    var matchingVerticals = verticals.Where(b => b.IntersectsRow(row)).ToList();
+    var matchingBorders = horizontals.Where(b => b.Start.Row == row).ToList();
 
-foreach (var c in trench)
-{
-    map.Set(c, '#');
-}
-
-//map.Print();
-
-var queue = new Queue<Coor>();
-queue.Enqueue(Coor.Zero);
-
-var outside = 0;
-
-while (queue.TryDequeue(out var c))
-{
-    if (map.Get(c) != '~')
+    for (int i = 0; i < matchingVerticals.Count; i++)
     {
-        outside++;
-        map.Set(c, '~');
-    }
+        var match = matchingVerticals[i];
 
-    foreach (var n in c.GetFourWayNeighbours())
-    {
-        if (n.InBoundsOf(map) && map.Get(n) == '.')
+        // Check if we are intersecting a horizontal border
+        var matchingBorder = matchingBorders.FirstOrDefault(h => h.Start.Col == match.Col);
+        if (matchingBorder != null)
         {
-            map.Set(n, '_');
-            queue.Enqueue(n);
+            if (inside)
+            {
+                rowMatches.Add(new Range(start, matchingBorder.Start.Col));
+            }
+
+            rowMatches.Add(new Range(matchingBorder.Start.Col, matchingBorder.End.Col));
+            ++i; // Skip the next as it will be a perpendicular border
+            inside = !inside;
+            start = matchingBorder.End.Col;
+            continue;
+        }
+
+        if (!inside)
+        {
+            start = match.Start.Col;
+            inside = true;
+        }
+        else
+        {
+            rowMatches.Add(new Range(start, match.Start.Col));
+        }
+    }
+
+    // Unify ranges
+    int j = 1;
+    while (j < rowMatches.Count)
+    {
+        var prev = rowMatches[j - 1];
+        var current = rowMatches[j];
+        if (current.Start - prev.End <= 1)
+        {
+            rowMatches.RemoveAt(j);
+            rowMatches[j - 1] = new Range(prev.Start, current.End);
+        }
+        else
+        {
+            j++;
+        }
+    }
+
+    horizontalMatches[row - minRow] = rowMatches;
+}
+
+var verticalMatches = new List<Range>[maxCol - minCol + 1];
+for (int col = minCol; col <= maxCol; col++)
+{
+    var colMatches = new List<Range>();
+
+    var inside = false;
+    var start = 0;
+    var matchingHorizontals = horizontals.Where(b => b.IntersectsCol(col)).ToList();
+    var matchingBorders = verticals.Where(b => b.Start.Col == col).ToList();
+
+    for (int i = 0; i < matchingHorizontals.Count; i++)
+    {
+        var match = matchingHorizontals[i];
+
+        // Check if we are intersecting a horizontal border
+        var matchingBorder = matchingBorders.FirstOrDefault(h => h.Start.Row == match.Row);
+        if (matchingBorder != null)
+        {
+            if (inside)
+            {
+                colMatches.Add(new Range(start, matchingBorder.Start.Row));
+            }
+
+            colMatches.Add(new Range(matchingBorder.Start.Row, matchingBorder.End.Row));
+            ++i; // Skip the next as it will be a perpendicular border
+            inside = !inside;
+            start = matchingBorder.End.Row;
+            continue;
+        }
+
+        if (!inside)
+        {
+            start = match.Start.Row;
+            inside = true;
+        }
+        else
+        {
+            colMatches.Add(new Range(start, match.Start.Row));
+            inside = false;
+        }
+    }
+
+    // Unify ranges
+    int j = 1;
+    while (j < colMatches.Count)
+    {
+        var prev = colMatches[j - 1];
+        var current = colMatches[j];
+        if (current.Start - prev.End <= 1)
+        {
+            colMatches.RemoveAt(j);
+            colMatches[j - 1] = new Range(prev.Start, current.End);
+        }
+        else
+        {
+            j++;
+        }
+    }
+
+    verticalMatches[col - minCol] = colMatches;
+}
+
+Console.WriteLine(horizontalMatches.SelectMany(m => m.Select(x => (long)x.End - x.Start + 1)).Sum());
+
+abstract file record Line(Coor Start, Coor End)
+{
+    public bool IntersectsRow(int row) => row >= Start.Row && row <= End.Row;
+    public bool IntersectsCol(int col) => col >= Start.Col && col <= End.Col;
+
+    public static Line Create(Coor start, Coor end)
+    {
+        if (start.Row == end.Row)
+        {
+            return start.Col < end.Col
+                ? new HorizontalLine(start, end)
+                : new HorizontalLine(end, start);
+        }
+        else
+        {
+            return start.Row < end.Row
+                ? new VerticalLine(start, end)
+                : new VerticalLine(end, start);
         }
     }
 }
 
-Console.Clear();
-map.Print();
-Console.WriteLine();
-Console.WriteLine($"Part 1: {(map.Height() * map.Width()) - outside}");
+file record HorizontalLine(Coor Start, Coor End) : Line(Start, End)
+{
+    public int Row => Start.Row;
+}
 
-file record Instruction(Coor Direction, int Distance, Color Color);
+file record VerticalLine(Coor Start, Coor End) : Line(Start, End)
+{
+    public int Col => Start.Col;
+}
+
+file record Instruction(Coor Direction, int Distance, string Color);
+
+file record InvertedInstruction : Instruction
+{
+    public InvertedInstruction(string color)
+        : base(
+            color.Last() switch
+            {
+                '0' => Coor.Right,
+                '1' => Coor.Down,
+                '3' => Coor.Up,
+                '2' => Coor.Left,
+                _ => throw new Exception()
+            },
+            Convert.ToInt32(new string(color.Take(color.Length - 1).ToArray()), 16),
+            color)
+    {
+    }
+}
