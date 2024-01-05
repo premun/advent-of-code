@@ -1,5 +1,5 @@
 ﻿using AdventOfCode.Common;
-using Common;
+
 using Coor = AdventOfCode.Common.Coor<int>;
 
 var map = Resources.GetInputFileLines()

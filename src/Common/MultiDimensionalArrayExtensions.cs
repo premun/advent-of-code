@@ -1,7 +1,7 @@
 ﻿using System.Text;
-using AdventOfCode.Common;
 
-namespace Common;
+namespace AdventOfCode.Common;
+
 public static class MultiDimensionalArrayExtensions
 {
     public static int Height<T>(this T[,] array) => array.GetLength(0);

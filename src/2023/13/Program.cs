@@ -1,5 +1,5 @@
 ﻿using AdventOfCode.Common;
-using Common;
+
 using GetVectors = System.Func<int, int, int, (System.Collections.Generic.IEnumerable<bool>, System.Collections.Generic.IEnumerable<bool>)>;
 
 var patterns = Resources.GetInputFileContent()

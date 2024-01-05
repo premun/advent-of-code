@@ -1,5 +1,4 @@
 ﻿using AdventOfCode.Common;
-using Common;
 
 char[,] map = Resources.GetInputFileLines().ParseAsArray();
 var symbols = new List<Symbol>();

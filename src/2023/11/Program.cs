@@ -1,5 +1,4 @@
 ﻿using AdventOfCode.Common;
-using Common;
 
 bool[,] map = Resources.GetInputFileLines()
     .ParseAsArray(c => c == '#');

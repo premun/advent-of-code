@@ -1,7 +1,7 @@
 ﻿using System.Drawing;
 using System.Text.RegularExpressions;
 using AdventOfCode.Common;
-using Common;
+
 using Coor = AdventOfCode.Common.Coor<int>;
 
 var regex = new Regex(@"(?<direction>R|D|L|U) (?<distance>[0-9]+) \((?<color>#[0-9a-h]{6})\)");
