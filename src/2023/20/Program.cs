@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Text;
-using AdventOfCode.Common;
+﻿using AdventOfCode.Common;
 
 Dictionary<string, string[]> modulesAndDestinations = Resources
     .GetInputFileLines()
@@ -15,7 +13,7 @@ Dictionary<string, Module> modules = modulesAndDestinations.Keys
 List<Output> outputs = modulesAndDestinations.Values
     .SelectMany(p => p)
     .Distinct()
-    .Where(name => !modules.ContainsKey(name))
+    .Except(modules.Keys)
     .Select(name => new Output(name))
     .ToList();
 
@@ -33,12 +31,7 @@ foreach (var pair in modulesAndDestinations)
     }
 }
 
-//var stateSize = modules.Values.Aggregate(0, (acc, module) => module switch
-//{
-//    Conjuction c => acc + c.Destinations.Count,
-//    FlipFlop => acc + 1,
-//    _ => acc,
-//});
+modules["button"] = new Button(modules.Values.OfType<Broadcaster>().First());
 
 (var lows, var highs) = Simulate(modules.Values, 1000);
 
@@ -46,8 +39,7 @@ Console.WriteLine($"{lows}, {highs} = {lows * highs}");
 
 static (long Lows, long Highs) Simulate(IReadOnlyCollection<Module> modules, int numOfPushes)
 {
-    var broadcaster = modules.OfType<Broadcaster>().First();
-    var button = new Button(broadcaster);
+    var button = modules.OfType<Button>().First();
 
     long lows = 0;
     long highs = 0;
@@ -86,7 +78,7 @@ static (int Low, int High) SendPulse(Pulse firstPulse)
     {
         var module = item.Module;
         var pulse = item.IsHigh;
-        var newPulse = module.SendPuls(pulse);
+        var newPulse = module.SendPuls();
 
         foreach (var nextModule in module.Destinations)
         {
@@ -113,54 +105,15 @@ static (int Low, int High) SendPulse(Pulse firstPulse)
 static bool IsReset(IReadOnlyCollection<Module> modules)
     => !modules.Any(m => (m is FlipFlop f && f.IsOn) || (m is Conjuction c && !c.AllDown));
 
-//static BitArray GetState(int size, IReadOnlyCollection<Module> modules)
-//{
-//    var state = new BitArray(size + 1);
-//    var i = -1;
-//    foreach (var module in modules)
-//    {
-//        if (module is FlipFlop flipFlop)
-//        {
-//            i++;
-//            if (flipFlop.IsOn)
-//            {
-//                state[i] = true;
-//            }
-//        }
-
-//        if (module is Conjuction conjuction)
-//        {
-//            foreach (var m in conjuction.Memory.Values)
-//            {
-//                i++;
-//                if (m)
-//                {
-//                    state[i] = true;
-//                }
-//            }
-//        }
-//    }
-
-//    var sb = new StringBuilder();
-
-//    for (int j = 0; j < state.Count; j++)
-//    {
-//        char c = state[j] ? '1' : '0';
-//        sb.Append(c);
-//    }
-
-//    Console.WriteLine(sb.ToString());
-
-//    return state;
-//}
-
 abstract file class Module(string name)
 {
     public string Name { get; } = name;
 
     public List<Module> Destinations { get; } = [];
 
-    public abstract bool SendPuls(bool isHigh);
+    protected Queue<bool> SendQueue { get; } = new();
+
+    public virtual bool SendPuls() => SendQueue.Dequeue();
 
     public abstract bool ReceivePulse(Module from, bool isHigh);
 
@@ -182,10 +135,9 @@ file class FlipFlop(string name) : Module(name)
         if (isHigh) return false;
 
         IsOn = !IsOn;
+        SendQueue.Enqueue(IsOn);
         return true;
     }
-
-    public override bool SendPuls(bool isHigh) => IsOn;
 }
 
 file class Conjuction(string name) : Module(name)
@@ -196,11 +148,11 @@ file class Conjuction(string name) : Module(name)
 
     public bool AllDown => _bitsUp == 0;
 
-    public Dictionary<Module, bool> Memory { get; } = [];
+    public Dictionary<string, bool> Memory { get; } = [];
 
     public override bool ReceivePulse(Module from, bool isHigh)
     {
-        if (!Memory.TryGetValue(from, out bool wasHigh))
+        if (!Memory.TryGetValue(from.Name, out bool wasHigh))
         {
             wasHigh = false;
         }
@@ -208,25 +160,33 @@ file class Conjuction(string name) : Module(name)
         if (wasHigh != isHigh)
         {
             _bitsUp += isHigh ? 1 : -1;
-            Memory[from] = isHigh;
+            Memory[from.Name] = isHigh;
         }
 
+        SendQueue.Enqueue(!AllUp);
         return true;
     }
 
-    public override bool SendPuls(bool isHigh) => !AllUp;
+    public override bool SendPuls()
+    {
+        // We return based on our current state, not in the queue
+        SendQueue.Dequeue();
+        return !AllUp;
+    }
 }
 
 file class Broadcaster() : Module("broadcaster")
 {
-    public override bool ReceivePulse(Module from, bool isHigh) => true;
-    public override bool SendPuls(bool isHigh) => isHigh;
+    public override bool ReceivePulse(Module from, bool isHigh)
+    {
+        SendQueue.Enqueue(isHigh);
+        return true;
+    }
 }
 
 file class Output(string name) : Module(name)
 {
     public override bool ReceivePulse(Module from, bool isHigh) => false;
-    public override bool SendPuls(bool isHigh) => throw new NotSupportedException();
 }
 
 file class Button : Module
@@ -237,7 +197,7 @@ file class Button : Module
     }
 
     public override bool ReceivePulse(Module from, bool isHigh) => true;
-    public override bool SendPuls(bool isHigh) => false;
+    public override bool SendPuls() => false;
 }
 
 file record Pulse(Module Module, bool IsHigh);
