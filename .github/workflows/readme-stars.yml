@@ -6,11 +6,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: k2bd/advent-readme-stars@dcd6ac034f7db5b0a0a02d53ffbfd71381b5a40d
+      - uses: miam-miam100/advent-readme-stars@20e208a0ba6867d1919798cbcc78c453460fa356
         with:
           userId: 1513619
           leaderboardId: 1072025
           sessionCookie: ${{ secrets.AOC_SESSION }}
+          solutionLocations: src/{yyyy}/{dd}/Program.cs
       - uses: stefanzweifel/git-auto-commit-action@e8f94e4dd298db5a6a2aa2d42fe0bcef6f2c9660
         with:
           commit_message: Update README stars
