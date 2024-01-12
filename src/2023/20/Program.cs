@@ -10,6 +10,7 @@ Dictionary<string, Module> modules = modulesAndDestinations.Keys
     .Select(Module.Parse)
     .ToDictionary(m => m.Name, m => m);
 
+// These only appear on the right side
 List<Output> outputs = modulesAndDestinations.Values
     .SelectMany(p => p)
     .Distinct()
@@ -27,79 +28,81 @@ foreach (var pair in modulesAndDestinations)
     var module = modules[pair.Key.Replace("%", null).Replace("&", null)];
     foreach (var dest in pair.Value)
     {
-        module.Destinations.Add(modules[dest]);
+        var destination = modules[dest];
+        module.Destinations.Add(destination);
+        if (destination is Conjuction c)
+        {
+            c.Memory[module] = false;
+        }
     }
 }
 
 modules["button"] = new Button(modules.Values.OfType<Broadcaster>().First());
 
-(var lows, var highs) = Simulate(modules.Values, 1000);
+(var lows, var highs) = Simulate(modules, 1000);
 
 Console.WriteLine($"{lows}, {highs} = {lows * highs}");
 
-static (long Lows, long Highs) Simulate(IReadOnlyCollection<Module> modules, int numOfPushes)
+static (int Lows, int Highs) Simulate(Dictionary<string, Module> modules, int numOfPushes)
 {
-    var button = modules.OfType<Button>().First();
+    var button = modules.Values.OfType<Button>().Single();
 
-    long lows = 0;
-    long highs = 0;
+    int lows = 0;
+    int highs = 0;
     for (int i = 1; i <= numOfPushes; i++)
     {
-        (var l, var h) = SendPulse(new Pulse(button, false));
-        lows += l;
-        highs += h;
-
-        Console.WriteLine($"{(l, h)} -> ({lows}, {highs})");
-
-        if (IsReset(modules))
+        try
         {
-            Console.WriteLine($"Found a reset after {i} rounds");
-            var pushesLeft = numOfPushes - i;
-            lows *= pushesLeft / i;
-            highs *= pushesLeft / i;
-            i = numOfPushes - (pushesLeft % i);
+            (var l, var h) = SendPulse(new Pulse(button, false));
+            lows += l;
+            highs += h;
         }
-
-        Console.WriteLine();
+        catch (RxHitWithLowPulseException)
+        {
+            return (i, -1);
+        }
     }
-
-    Console.WriteLine($"{lows}, {highs} = {lows * highs}");
 
     return (lows, highs);
 }
 
-static (int Low, int High) SendPulse(Pulse firstPulse)
+static (int, int) SendPulse(Pulse firstPulse)
 {
-    int low = 0;
-    int high = 0;
+    int lows = 0;
+    int highs = 0;
 
     var pulseQueue = new Queue<Pulse>([firstPulse]);
     while (pulseQueue.TryDequeue(out var item))
     {
         var module = item.Module;
         var pulse = item.IsHigh;
-        var newPulse = module.SendPuls();
+
+        if (pulse)
+        {
+            highs += module.Destinations.Count;
+        }
+        else
+        {
+            lows += module.Destinations.Count;
+        }
 
         foreach (var nextModule in module.Destinations)
         {
-            if (newPulse)
+            if (nextModule.Name == "rx" && pulse == false)
             {
-                high++;
-            }
-            else
-            {
-                low++;
+                throw new RxHitWithLowPulseException();
             }
 
-            Console.WriteLine($"{module.Name} -{(newPulse ? "high" : "low")}-> {nextModule.Name}");
-            if (nextModule.ReceivePulse(module, newPulse))
+            //Console.WriteLine($"{module.Name} -{(pulse ? "high" : "low")}-> {nextModule.Name}");
+            var nextPulse = nextModule.ReceivePulse(module, pulse);
+            if (nextPulse.HasValue)
             {
-                pulseQueue.Enqueue(new Pulse(nextModule, newPulse));
+                pulseQueue.Enqueue(new Pulse(nextModule, nextPulse.Value));
             }
         }
     }
 
-    return (low, high);
+    return (lows, highs);
 }
 
 static bool IsReset(IReadOnlyCollection<Module> modules)
@@ -111,11 +114,7 @@ abstract file class Module(string name)
 
     public List<Module> Destinations { get; } = [];
 
-    protected Queue<bool> SendQueue { get; } = new();
-
-    public virtual bool SendPuls() => SendQueue.Dequeue();
-
-    public abstract bool ReceivePulse(Module from, bool isHigh);
+    public abstract bool? ReceivePulse(Module from, bool isHigh);
 
     public static Module Parse(string name) => name switch
     {
@@ -130,13 +129,12 @@ file class FlipFlop(string name) : Module(name)
 {
     public bool IsOn { get; private set; } = false;
 
-    public override bool ReceivePulse(Module from, bool isHigh)
+    public override bool? ReceivePulse(Module from, bool isHigh)
     {
-        if (isHigh) return false;
+        if (isHigh) return null;
 
         IsOn = !IsOn;
-        SendQueue.Enqueue(IsOn);
-        return true;
+        return IsOn;
     }
 }
 
@@ -144,49 +142,34 @@ file class Conjuction(string name) : Module(name)
 {
     private int _bitsUp = 0;
 
-    public bool AllUp => _bitsUp == Destinations.Count;
+    public bool AllUp => _bitsUp == Memory.Count;
 
     public bool AllDown => _bitsUp == 0;
 
-    public Dictionary<string, bool> Memory { get; } = [];
+    public Dictionary<Module, bool> Memory { get; } = [];
 
-    public override bool ReceivePulse(Module from, bool isHigh)
+    public override bool? ReceivePulse(Module from, bool isHigh)
     {
-        if (!Memory.TryGetValue(from.Name, out bool wasHigh))
-        {
-            wasHigh = false;
-        }
+        var wasHigh = Memory[from];
 
         if (wasHigh != isHigh)
         {
             _bitsUp += isHigh ? 1 : -1;
-            Memory[from.Name] = isHigh;
+            Memory[from] = isHigh;
         }
 
-        SendQueue.Enqueue(!AllUp);
-        return true;
-    }
-
-    public override bool SendPuls()
-    {
-        // We return based on our current state, not in the queue
-        SendQueue.Dequeue();
         return !AllUp;
     }
 }
 
 file class Broadcaster() : Module("broadcaster")
 {
-    public override bool ReceivePulse(Module from, bool isHigh)
-    {
-        SendQueue.Enqueue(isHigh);
-        return true;
-    }
+    public override bool? ReceivePulse(Module from, bool isHigh) => isHigh;
 }
 
 file class Output(string name) : Module(name)
 {
-    public override bool ReceivePulse(Module from, bool isHigh) => false;
+    public override bool? ReceivePulse(Module from, bool isHigh) => null;
 }
 
 file class Button : Module
@@ -196,8 +179,9 @@ file class Button : Module
         Destinations.Add(broadcaster);
     }
 
-    public override bool ReceivePulse(Module from, bool isHigh) => true;
-    public override bool SendPuls() => false;
+    public override bool? ReceivePulse(Module from, bool isHigh) => false;
 }
 
 file record Pulse(Module Module, bool IsHigh);
+
+file class RxHitWithLowPulseException() : Exception();
