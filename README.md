@@ -1,4 +1,6 @@
-## 2024 Results
+# Advent of Code solutions by premun
+
+Join here https://adventofcode.com/
 
 <!--- advent_readme_stars table --->
 ## 2024 Results
