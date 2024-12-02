@@ -47,8 +47,8 @@ public static class Resources
         return stream;
     }
 
-    public static int[] SplitToNumbers(this string csv) => csv
-        .SplitBy(",")
+    public static int[] SplitToNumbers(this string csv, string delimiter = ",") => csv
+        .SplitBy(delimiter)
         .Select(int.Parse)
         .ToArray();
 
