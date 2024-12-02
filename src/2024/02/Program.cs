@@ -13,8 +13,7 @@ Console.WriteLine($"Part 2: {almostSafeLevels.Count()}");
 static bool IsSafe(IReadOnlyCollection<int> level)
 {
     var differences = level
-        .Take(level.Count - 1)
-        .Zip(level.Skip(1))
+        .PairWithNext()
         .Select(pair => pair.Second - pair.First)
         .ToList();
 

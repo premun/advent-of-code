@@ -36,4 +36,20 @@ public static class DifferentCombinationsExtension
         dict[key] += valueToAdd;
         return dict[key];
     }
+
+    public static IEnumerable<(T First, T Second)> PairWithNext<T>(this IEnumerable<T> elements)
+    {
+        var enumerator = elements.GetEnumerator();
+        if (!enumerator.MoveNext())
+        {
+            yield break;
+        }
+
+        var previous = enumerator.Current;
+        while (enumerator.MoveNext())
+        {
+            yield return (previous, enumerator.Current);
+            previous = enumerator.Current;
+        }
+    }
 }
