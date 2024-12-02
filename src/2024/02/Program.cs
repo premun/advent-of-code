@@ -10,15 +10,19 @@ var almostSafeLevels = levels.Where(IsAlmostSafe);
 Console.WriteLine($"Part 1: {safeLevels.Count()}");
 Console.WriteLine($"Part 2: {almostSafeLevels.Count()}");
 
-static bool IsSafe(IList<int> level)
+static bool IsSafe(IReadOnlyCollection<int> level)
 {
-    var pairs = level.Take(level.Count - 1).Zip(level.Skip(1)).ToList();
-    return pairs.Select(p => Math.Abs(p.First - p.Second)).All(p => p >= 1 && p <= 3)
-        && (pairs.All(p => p.First > p.Second)
-         || pairs.All(p => p.First < p.Second));
+    var differences = level
+        .Take(level.Count - 1)
+        .Zip(level.Skip(1))
+        .Select(pair => pair.Second - pair.First)
+        .ToList();
+
+    return differences.Select(Math.Abs).All(p => p >= 1 && p <= 3)
+        && (differences.All(p => p > 0) || differences.All(p => p < 0));
 }
 
-static bool IsAlmostSafe(IList<int> level)
+static bool IsAlmostSafe(IReadOnlyCollection<int> level)
 {
     if (IsSafe(level))
     {
