@@ -6,7 +6,8 @@ class Player
     public int Points { get; set; }
 }
 
-class SimpleDiracDiceGame(IDice dice, int maxPosition, int winningPoints) : DiracDiceGame(maxPosition)
+class SimpleDiracDiceGame(IDice dice, int maxPosition, int winningPoints)
+    : DiracDiceGame(maxPosition)
 {
     private readonly IDice _dice = dice;
     private readonly int _winningPoints = winningPoints;

@@ -18,7 +18,7 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
     public static Coor<T> operator -(Coor<T> me, Coor<T> other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Coor<T> operator +(Coor<T> me, Coor<T> other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
-    public static readonly IReadOnlyCollection<Coor<T>> Directions =
+    public static readonly IReadOnlyList<Coor<T>> Directions =
     [
         Right,
         Down,
@@ -26,7 +26,7 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
         Up,
     ];
 
-    public static readonly IReadOnlyCollection<Coor<T>> FourWayNeighbours =
+    public static readonly IReadOnlyList<Coor<T>> FourWayNeighbours =
     [
         Right,
         Down,
@@ -34,7 +34,7 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
         Up,
     ];
 
-    public static readonly IReadOnlyCollection<Coor<T>> NineWayNeighbours =
+    public static readonly IReadOnlyList<Coor<T>> NineWayNeighbours =
     [
         new(-T.One, -T.One),
         new(-T.One, T.Zero),

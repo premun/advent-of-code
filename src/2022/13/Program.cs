@@ -44,8 +44,8 @@ abstract record Packet : IComparable
         }
 
         // If exactly one value is an integer, convert the integer to a list which contains that integer as its only value
-        List l1 = p1 is Number n ? new List(new[] { n }) : (List)p1;
-        List l2 = p2 is Number m ? new List(new[] { m }) : (List)p2;
+        List l1 = p1 is Number n ? new List([n]) : (List)p1;
+        List l2 = p2 is Number m ? new List([m]) : (List)p2;
 
         // If both values are lists, compare the first value of each list, then the second value, and so on
         for (int i = 0;; i++)

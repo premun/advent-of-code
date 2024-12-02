@@ -35,7 +35,7 @@ var validTickets = nearbyTickets
 while (fieldMapping.Count < myTicket.Length)
 {
     var unmappedFields = Enumerable.Range(0, myTicket.Length)
-        .Except(fieldMapping.Keys.ToList())
+        .Except([.. fieldMapping.Keys])
         .ToList();
 
     foreach (var unmappedField in unmappedFields)

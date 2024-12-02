@@ -57,7 +57,7 @@ internal class LongestPathResolverWithoutSlopes(string[] map)
 
     // :(((( Brute force :(((
     // Need to find a longest path algorithm for cyclic directed graphs
-    private int FindLongestPathRecursive(Junction start, Junction end, List<Junction> currentPath, int distance)
+    private static int FindLongestPathRecursive(Junction start, Junction end, List<Junction> currentPath, int distance)
     {
         var current = currentPath.Last();
         if (current == end)
@@ -95,7 +95,7 @@ internal class LongestPathResolverWithoutSlopes(string[] map)
 
 internal abstract class LongestPathResolver
 {
-    private static readonly Dictionary<char, Coor> Directions = new()
+    private static readonly Dictionary<char, Coor> s_directions = new()
     {
         { '<', Coor.Left },
         { '>', Coor.Right },
@@ -124,8 +124,8 @@ internal abstract class LongestPathResolver
             .Single();
 
         Slopes = map.AllCoordinates()
-            .Where(coor => Directions.ContainsKey(map.Get(coor)))
-            .ToDictionary(c => c, c => new Slope(Directions[map.Get(c)]));
+            .Where(coor => s_directions.ContainsKey(map.Get(coor)))
+            .ToDictionary(c => c, c => new Slope(s_directions[map.Get(c)]));
 
         Junctions = new()
         {

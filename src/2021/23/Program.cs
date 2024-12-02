@@ -69,29 +69,29 @@ static int FindLowestEnergyCost(AmphipodWorld startWorld, AmphipodWorld finished
     return result;
 }
 
-var startWorld = new AmphipodWorld(new[]
-{
+var startWorld = new AmphipodWorld(
+[
     "#############",
     "#...........#",
     "###B#A#B#C###",
     "  #C#D#D#A#",
     "  #########"
-});
+]);
 
-var endWorld = new AmphipodWorld(new[]
-{
+var endWorld = new AmphipodWorld(
+[
     "#############",
     "#...........#",
     "###A#B#C#D###",
     "  #A#B#C#D#",
     "  #########"
-});
+]);
 
 Console.WriteLine($"Part 1: " + FindLowestEnergyCost(startWorld, endWorld));
 Console.WriteLine();
 
-startWorld = new AmphipodWorld(new[]
-{
+startWorld = new AmphipodWorld(
+[
     "#############",
     "#...........#",
     "###B#A#B#C###",
@@ -99,10 +99,10 @@ startWorld = new AmphipodWorld(new[]
     "  #D#B#A#C#",
     "  #C#D#D#A#",
     "  #########",
-});
+]);
 
-endWorld = new AmphipodWorld(new[]
-{
+endWorld = new AmphipodWorld(
+[
     "#############",
     "#...........#",
     "###A#B#C#D###",
@@ -110,6 +110,6 @@ endWorld = new AmphipodWorld(new[]
     "  #A#B#C#D#",
     "  #A#B#C#D#",
     "  #########"
-});
+]);
 
 Console.WriteLine($"Part 2: " + FindLowestEnergyCost(startWorld, endWorld));

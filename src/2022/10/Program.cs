@@ -1,7 +1,7 @@
 ﻿using AdventOfCode.Common;
 
 var commands = Resources.GetInputFileLines();
-var system = new CommunicationSystem(40, new[] { 20, 60, 100, 140, 180, 220 });
+var system = new CommunicationSystem(40, [20, 60, 100, 140, 180, 220]);
 system.RunCommands(commands);
 
 Console.WriteLine($"Part 1: {system.Signal}");

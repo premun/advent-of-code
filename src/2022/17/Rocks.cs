@@ -12,53 +12,53 @@ abstract class Rock(IReadOnlyCollection<Coor> positions)
 
 class RowRock : Rock
 {
-    public RowRock() : base(new[]
-    {
+    public RowRock() : base(
+    [
     new Coor(0, 2), new Coor(0, 3), new Coor(0, 4), new Coor(0, 5),
-})
+])
     { }
 }
 
 class CrossRock : Rock
 {
-    public CrossRock() : base(new[]
-    {
+    public CrossRock() : base(
+    [
                     new Coor(0, 3),
     new Coor(1, 2), new Coor(1, 3), new Coor(1, 4),
                     new Coor(2, 3),
-})
+])
     { }
 }
 
 class LRock : Rock
 {
-    public LRock() : base(new[]
-    {
+    public LRock() : base(
+    [
                                     new Coor(0, 4),
                                     new Coor(1, 4),
     new Coor(2, 2), new Coor(2, 3), new Coor(2, 4),
-})
+])
     { }
 }
 
 class ColumnRock : Rock
 {
-    public ColumnRock() : base(new[]
-    {
+    public ColumnRock() : base(
+    [
     new Coor(0, 2),
     new Coor(1, 2),
     new Coor(2, 2),
     new Coor(3, 2),
-})
+])
     { }
 }
 
 class BoxRock : Rock
 {
-    public BoxRock() : base(new[]
-    {
+    public BoxRock() : base(
+    [
     new Coor(0, 2), new Coor(0, 3),
     new Coor(1, 2), new Coor(1, 3),
-})
+])
     { }
 }

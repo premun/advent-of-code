@@ -12,7 +12,7 @@ Console.WriteLine($"Part 2: {LavaLagoonMeasurer.MeasureLagoon(instructions.Selec
 
 record Instruction(Coor Direction, int Distance, string Color)
 {
-    private static readonly Regex Regex = new(@"(?<direction>R|D|L|U) (?<distance>[0-9]+) \(#(?<color>[0-9a-h]{6})\)");
+    private static readonly Regex s_regex = new(@"(?<direction>R|D|L|U) (?<distance>[0-9]+) \(#(?<color>[0-9a-h]{6})\)");
 
     public Instruction Invert() => new(
         Color.Last() switch
@@ -28,7 +28,7 @@ record Instruction(Coor Direction, int Distance, string Color)
 
     public static Instruction Parse(string s)
     {
-        var match = Regex.Match(s);
+        var match = s_regex.Match(s);
         return new Instruction(
             match.Groups["direction"].Value[0] switch
             {

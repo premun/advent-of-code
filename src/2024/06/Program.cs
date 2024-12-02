@@ -1,4 +1,5 @@
-﻿
+﻿using AdventOfCode.Common;
+
 var lines = Resources.GetInputFileLines("input.txt");
 
 Console.WriteLine($"Part 1: {""}");

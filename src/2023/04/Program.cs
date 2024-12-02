@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-IReadOnlyCollection<Card> cards = Resources.GetInputFileLines()
+Card[] cards = Resources.GetInputFileLines()
     .Select(Card.Parse)
     .ToArray();
 
@@ -9,10 +9,10 @@ var scores = cards
     .Select(card => Math.Pow(2, card.MatchingNumbers - 1));
 
 var wonCards = cards.ToDictionary(c => c.Id, c => 1L);
-for (int i = 0; i < cards.Count; i++)
+for (int i = 0; i < cards.Length; i++)
 {
     var card = cards.ElementAt(i);
-    for (int j = 1; j <= card.MatchingNumbers && j + card.Id <= cards.Count; j++)
+    for (int j = 1; j <= card.MatchingNumbers && j + card.Id <= cards.Length; j++)
     {
         wonCards[card.Id + j] += wonCards[card.Id];
     }

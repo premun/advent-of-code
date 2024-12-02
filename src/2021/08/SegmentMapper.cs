@@ -116,7 +116,7 @@ class SegmentMapper
         foreach (var digit in digits)
         {
             // Map to our digit
-            var mappedDigit = new string(digit.Select(x => _segmentMapping[x]).OrderBy(x => x).ToArray());
+            var mappedDigit = new string([.. digit.Select(x => _segmentMapping[x]).OrderBy(x => x)]);
 
             var value = s_digits.First(x => x.Value == mappedDigit).Key;
 

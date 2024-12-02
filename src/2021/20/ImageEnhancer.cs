@@ -5,8 +5,8 @@ namespace AdventOfCode._2021_20;
 
 class ImageEnhancer(ReadOnlyCollection<bool> algorithm)
 {
-    private static readonly IEnumerable<Coor> s_arounds = new Coor[]
-    {
+    private static readonly IEnumerable<Coor> s_arounds =
+    [
         new (-1, -1),
         new (-1, 0),
         new (-1, 1),
@@ -18,7 +18,7 @@ class ImageEnhancer(ReadOnlyCollection<bool> algorithm)
         new (1, -1),
         new (1, 0),
         new (1, 1),
-    };
+    ];
 
     private readonly ReadOnlyCollection<bool> _algorithm = algorithm;
 
