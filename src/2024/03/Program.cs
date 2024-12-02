@@ -1,3 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var lines = Resources.GetResourceFileLines("input.txt");
+var lines = Resources.GetInputFileLines("input.txt");
+
+Console.WriteLine($"Part 1: {""}");
+Console.WriteLine($"Part 2: {""}");
