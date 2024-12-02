@@ -1,4 +1,8 @@
+## 2024 Results
+
 <!--- advent_readme_stars table --->
+<!--- advent_readme_stars table --->
+
 ## 2023 Results
 
 | Day | Solution | Part 1 | Part 2 |
@@ -21,7 +25,7 @@
 | [Day 19](https://adventofcode.com/2023/day/19) | [Program.cs](src/2023/19/Program.cs) | ⭐ |   |
 | [Day 20](https://adventofcode.com/2023/day/20) | [Program.cs](src/2023/20/Program.cs) | ⭐ |   |
 | [Day 23](https://adventofcode.com/2023/day/23) | [Program.cs](src/2023/23/Program.cs) | ⭐ | ⭐ |
-<!--- advent_readme_stars table --->
+
 ## 2022 Results
 
 | Day | Solution | Part 1 | Part 2 |
