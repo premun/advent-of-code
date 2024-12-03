@@ -9,6 +9,7 @@ Join here https://adventofcode.com/
 | :---: | :---: | :---: | :---: |
 | [Day 1](https://adventofcode.com/2024/day/1) | [Program.cs](src/2024/01/Program.cs) | ⭐ | ⭐ |
 | [Day 2](https://adventofcode.com/2024/day/2) | [Program.cs](src/2024/02/Program.cs) | ⭐ | ⭐ |
+| [Day 3](https://adventofcode.com/2024/day/3) | [Program.cs](src/2024/03/Program.cs) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
 
 ## 2023 Results
