@@ -1,6 +1,6 @@
 # Advent of Code solutions by premun
 
-Join here https://adventofcode.com/
+<p align=center>🎄 Join here https://adventofcode.com/ 🎄</p>
 
 <!--- advent_readme_stars table --->
 ## 2024 Results
