@@ -131,5 +131,8 @@
     <Project Path="src/2024/23/23.csproj" />
     <Project Path="src/2024/24/24.csproj" />
   </Folder>
+  <Folder Name="/Solution Items/" Id="8ec462fd-d22e-90a8-e5ce-7e832ba40c5d">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="src/Common/Common.csproj" />
 </Solution>
