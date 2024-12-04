@@ -1,6 +1,6 @@
 ﻿using AdventOfCode.Common;
 
-var levels = Resources.GetInputFileLines("input.txt")
+var levels = Resources.GetInputFileLines()
     .Select(line => line.SplitToNumbers(" "))
     .ToList();
 

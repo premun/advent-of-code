@@ -12,7 +12,7 @@ var similarity = from left in Left
 Console.WriteLine($"Part 1: {distances.Sum()}");
 Console.WriteLine($"Part 2: {similarity.Sum()}");
 
-static int[] GetColumn(int index) => Resources.GetInputFileLines("input.txt")
+static int[] GetColumn(int index) => Resources.GetInputFileLines()
     .Select(line => line.SplitToNumbers(" "))
     .Select(pair => pair[index])
     .ToArray();
