@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Drawing;
+using System.Linq;
+using System.Text;
 
 namespace AdventOfCode.Common;
 
@@ -85,6 +87,49 @@ public static class MultiDimensionalArrayExtensions
             }
 
             Console.WriteLine();
+        }
+    }
+
+    // Returns a set of vectors of possible ways to traverse a rectangle:
+    // - Rows
+    // - Columns
+    // - Diagonals
+    public static IEnumerable<List<Coor<int>>> GetVectors<T>(this T[,] map)
+    {
+        var width = map.Width();
+        var height = map.Height();
+
+        // Horizontal rows
+        for (int row = 0; row < width; row++)
+            yield return [.. Enumerable.Range(0, width).Select(col => new Coor<int>(row, col))];
+
+        // Vertical cols
+        for (int col = 0; col < width; col++)
+            yield return [.. Enumerable.Range(0, height).Select(row => new Coor<int>(row, col))];
+
+        for (int i = 0; i < height + width - 1; i++)
+        {
+            var diagonal1 = new List<Coor<int>>();
+            var diagonal2 = new List<Coor<int>>();
+
+            int row = Math.Min(i, height - 1);
+            int col = Math.Max(0, i - height + 1);
+            var c1 = new Coor<int>(row, col);
+            var c2 = new Coor<int>(row, width - col - 1);
+
+            do
+            {
+                diagonal1.Add(c1);
+                diagonal2.Add(c2);
+                row--;
+                col++;
+                c1 = new Coor<int>(row, col);
+                c2 = new Coor<int>(row, width - col - 1);
+            }
+            while (c1.InBoundsOf(map));
+
+            yield return diagonal1;
+            yield return diagonal2;
         }
     }
 
