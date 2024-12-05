@@ -11,6 +11,7 @@
 | [Day 2](https://adventofcode.com/2024/day/2) | [Program.cs](src/2024/02/Program.cs) | ⭐ | ⭐ |
 | [Day 3](https://adventofcode.com/2024/day/3) | [Program.cs](src/2024/03/Program.cs) | ⭐ | ⭐ |
 | [Day 4](https://adventofcode.com/2024/day/4) | [Program.cs](src/2024/04/Program.cs) | ⭐ | ⭐ |
+| [Day 5](https://adventofcode.com/2024/day/5) | [Program.cs](src/2024/05/Program.cs) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
 
 ## 2023 Results
