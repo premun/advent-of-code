@@ -101,4 +101,13 @@ public static class CoorExtensions
             Console.WriteLine();
         }
     }
+
+    public static Coor<T> TurnRight<T>(this Coor<T> direction) where T : INumber<T> => direction switch
+    {
+        _ when direction == Coor<T>.Up => Coor<T>.Right,
+        _ when direction == Coor<T>.Right => Coor<T>.Down,
+        _ when direction == Coor<T>.Down => Coor<T>.Left,
+        _ when direction == Coor<T>.Left => Coor<T>.Up,
+        _ => throw new NotImplementedException()
+    };
 }
