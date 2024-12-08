@@ -13,6 +13,7 @@
 | [Day 4](https://adventofcode.com/2024/day/4) | [Program.cs](src/2024/04/Program.cs) | ⭐ | ⭐ |
 | [Day 5](https://adventofcode.com/2024/day/5) | [Program.cs](src/2024/05/Program.cs) | ⭐ | ⭐ |
 | [Day 6](https://adventofcode.com/2024/day/6) | [Program.cs](src/2024/06/Program.cs) | ⭐ | ⭐ |
+| [Day 7](https://adventofcode.com/2024/day/7) | [Program.cs](src/2024/07/Program.cs) | ⭐ | ⭐ |
 | [Day 8](https://adventofcode.com/2024/day/8) | [Program.cs](src/2024/08/Program.cs) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
 
