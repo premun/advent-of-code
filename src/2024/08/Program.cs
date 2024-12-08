@@ -14,14 +14,14 @@ Console.WriteLine($"Part 2: {GetAntinodeCount(true)}");
 int GetAntinodeCount(bool allInLine)
 {
     return antennasByFrequency
-    .SelectMany(group => group
-        .AllCombinations(includeIdentities: false)
-        .Where(pair => pair.Item1.Col < pair.Item2.Col) // We don't need both combinations (x,y) and (y,x)
-        .SelectMany(pair => allInLine
-            ? GetAntinodes2(pair.Item1, pair.Item2)
-            : GetAntinodes1(pair.Item1, pair.Item2)))
-    .Distinct()
-    .Count();
+        .SelectMany(group => group
+            .AllCombinations(includeIdentities: false)
+            .Where(pair => pair.Item1.Col < pair.Item2.Col) // We don't need both combinations (x,y) and (y,x)
+            .SelectMany(pair => allInLine
+                ? GetAntinodes2(pair.Item1, pair.Item2)
+                : GetAntinodes1(pair.Item1, pair.Item2)))
+        .Distinct()
+        .Count();
 }
 
 IEnumerable<Coor> GetAntinodes1(Coor a1, Coor a2)

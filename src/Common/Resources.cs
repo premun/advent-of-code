@@ -162,4 +162,8 @@ public static class Resources
     {
         return a * b / GetGreatestCommonDivisor(a, b);
     }
+
+    public static ulong Sum(this IEnumerable<ulong> numbers)
+        => numbers.Aggregate(0UL, (i, acc) => i + acc);
+
 }
