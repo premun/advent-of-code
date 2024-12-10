@@ -14,39 +14,47 @@ int position = 0;
 
 var debug = true;
 
-while (next.Id < last.Id)
+while (forwardStream < backwardStream)
 {
     while (next is FileBlock)
     {
         MoveBlock(next.Id);
         next = forwardStream.GetNext();
+
+        if (forwardStream > backwardStream)
+            break;
     }
 
     while (last is FreeBlock)
     {
         last = backwardStream.GetNext();
+
+        if (forwardStream > backwardStream)
+            break;
     }
 
     MoveBlock(last.Id);
 
     next = forwardStream.GetNext();
+    if (forwardStream > backwardStream)
+        break;
     last = backwardStream.GetNext();
+
+    if (forwardStream > backwardStream)
+        break;
 }
 
 if (debug) Console.Write('.');
 
 // We ended up somewhere in a single file block, we need to process it
-if (last is FileBlock)
-{
-    var bit1 = forwardStream.Bit;
-    var bit2 = backwardStream.Bit;
-
-    while (bit1 <= bit2)
-    {
-        MoveBlock(last.Id);
-        bit1++;
-    }
-}
+//if (last is FileBlock)
+//{
+//    while (forwardStream != backwardStream)
+//    {
+//        MoveBlock(last.Id);
+//        last = backwardStream.GetNext();
+//    }
+//}
 
 Console.WriteLine();
 
@@ -63,52 +71,79 @@ void MoveBlock(int blockId)
 file class BlockStream
 {
     protected readonly IEnumerator<int> _diskMap;
-    protected int _id;
+    protected int _blockId;
+    protected int _fileId;
     protected int _bit;
     private bool _currentBlockIsFile = true;
 
     public BlockStream(IEnumerable<int> diskMap)
     {
         _diskMap = diskMap.GetEnumerator();
-        _id = 0;
+        _blockId = 0;
         _diskMap.MoveNext();
-        _bit = _diskMap.Current;
+        _bit = 0;
     }
 
-    protected virtual int Id => _id;
-    public virtual int Bit => _diskMap.Current - _bit - 1;
+    protected virtual int Bit => _bit - 1;
+    protected virtual int BlockId => _blockId;
+    protected virtual int FileId => _fileId;
 
     public Block GetNext()
     {
-        while (_bit == 0)
+        _bit++;
+        while (_bit == _diskMap.Current)
         {
             if (!_diskMap.MoveNext())
             {
-                return new FreeBlock(Id, int.MaxValue);
+                return new FreeBlock(FileId, int.MaxValue);
             }
 
+            _bit = 0;
             _currentBlockIsFile = !_currentBlockIsFile;
-            _bit = _diskMap.Current;
-
             if (_currentBlockIsFile)
             {
-                _id++;
+                _fileId++;
             }
+            _blockId++;
         }
 
-        _bit--;
         return _currentBlockIsFile
-            ? new FileBlock(Id, _diskMap.Current)
-            : new FreeBlock(Id, _diskMap.Current);
+            ? new FileBlock(FileId, _diskMap.Current)
+            : new FreeBlock(_blockId, _diskMap.Current);
+    }
+
+    public static bool operator <(BlockStream first, BlockStream second)
+    {
+        if (first.BlockId < second.BlockId) return true;
+        if (first.BlockId == second.BlockId) return first.Bit < second.Bit;
+        return false;
+    }
+
+    public static bool operator >(BlockStream first, BlockStream second)
+    {
+        return second < first;
+    }
+
+    public static bool operator ==(BlockStream first, BlockStream second)
+    {
+        return first.BlockId == second.BlockId && first.Bit == second.Bit;
+    }
+
+    public static bool operator !=(BlockStream first, BlockStream second)
+    {
+        return first.BlockId != second.BlockId || first.Bit == second.Bit;
     }
 }
 
 file class ReverseBlockStream(int[] diskMap)
     : BlockStream(diskMap.Reverse())
 {
-    private readonly int _maxId = diskMap.Length / 2;
-    protected override int Id => _maxId - _id;
-    public override int Bit => _bit;
+    private readonly int _maxFileId = diskMap.Length / 2;
+    private readonly int _maxBlockId = diskMap.Length - 1;
+
+    protected override int FileId => _maxFileId - _fileId;
+    protected override int Bit => _diskMap.Current - _bit - 1;
+    protected override int BlockId => _maxBlockId - _blockId;
 }
 
 abstract file record Block(int Id, int Size);
