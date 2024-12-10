@@ -18,9 +18,7 @@ while (next.Id < last.Id)
 {
     while (next is FileBlock)
     {
-        checksum += (ulong)(next.Id * position);
-        position++;
-        if (debug) Console.Write((char)(next.Id + '0'));
+        MoveBlock(next.Id);
         next = forwardStream.GetNext();
     }
 
@@ -29,9 +27,7 @@ while (next.Id < last.Id)
         last = backwardStream.GetNext();
     }
 
-    checksum += (ulong)(last.Id * position);
-    position++;
-    if (debug) Console.Write((char)(last.Id + '0'));
+    MoveBlock(last.Id);
 
     next = forwardStream.GetNext();
     last = backwardStream.GetNext();
@@ -40,18 +36,15 @@ while (next.Id < last.Id)
 if (debug) Console.Write('.');
 
 // We ended up somewhere in a single file block, we need to process it
-if (next is FileBlock)
+if (last is FileBlock)
 {
-    // TODO: This could be better - we could make the pointers meet inside the block
-    var sum = 0UL;
-    for (int i = 0; i < diskMap.Length; i += 2)
-        sum += (ulong)diskMap[i];
+    var bit1 = forwardStream.Bit;
+    var bit2 = backwardStream.Bit;
 
-    for (ulong i = (ulong)position; i < sum; ++i)
+    while (bit1 <= bit2)
     {
-        checksum += (ulong)(last.Id * position);
-        position++;
-        if (debug) Console.Write((char)(last.Id + '0'));
+        MoveBlock(last.Id);
+        bit1++;
     }
 }
 
@@ -60,11 +53,18 @@ Console.WriteLine();
 Console.WriteLine($"Part 1: {checksum}");
 Console.WriteLine($"Part 2: {""}");
 
+void MoveBlock(int blockId)
+{
+    checksum += (ulong)(blockId * position);
+    position++;
+    if (debug) Console.Write((char)(blockId + '0'));
+}
+
 file class BlockStream
 {
-    private readonly IEnumerator<int> _diskMap;
+    protected readonly IEnumerator<int> _diskMap;
     protected int _id;
-    private int _bit;
+    protected int _bit;
     private bool _currentBlockIsFile = true;
 
     public BlockStream(IEnumerable<int> diskMap)
@@ -74,6 +74,9 @@ file class BlockStream
         _diskMap.MoveNext();
         _bit = _diskMap.Current;
     }
+
+    protected virtual int Id => _id;
+    public virtual int Bit => _diskMap.Current - _bit - 1;
 
     public Block GetNext()
     {
@@ -98,16 +101,14 @@ file class BlockStream
             ? new FileBlock(Id, _diskMap.Current)
             : new FreeBlock(Id, _diskMap.Current);
     }
-
-    protected virtual int Id => _id;
 }
 
 file class ReverseBlockStream(int[] diskMap)
     : BlockStream(diskMap.Reverse())
 {
     private readonly int _maxId = diskMap.Length / 2;
-
     protected override int Id => _maxId - _id;
+    public override int Bit => _bit;
 }
 
 abstract file record Block(int Id, int Size);
