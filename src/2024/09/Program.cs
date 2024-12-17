@@ -4,99 +4,89 @@ int[] diskMap = Resources.GetInputFileLines().First()
     .Select(c => c - '0')
     .ToArray();
 
-var debug = true;
+var blocks = new LinkedList<Block>();
+bool empty = false;
 
-var forward = new BlockStream(diskMap);
-var backward = new BlockStream(diskMap.Reverse());
-var blockCount = diskMap.Length;
-var fileBlockCount = blockCount / 2;
-var position = 0;
+for (int i = 0; i < diskMap.Length; i++)
+{
+    blocks.AddLast(!empty
+        ? new FileBlock((i + 1) / 2, i, diskMap[i])
+        : new FreeBlock(i, diskMap[i]));
+    empty = !empty;
+}
+
+LinkedListNode<Block> end = blocks.Last!;
+while(end != blocks.First)
+{
+    LinkedListNode<Block> start = blocks.First!;
+    while (start != end)
+    {
+        if (end.Value is not FileBlock fileToMove)
+        {
+            end = end.Previous!;
+            continue;
+        }
+
+        if (start.Value is not FreeBlock free || free.Size < fileToMove.Size)
+        {
+            start = start.Next!;
+            continue;
+        }
+
+        var newStart = start.Next;
+        blocks.AddBefore(start, new FileBlock(fileToMove.FileId, fileToMove.BlockId, fileToMove.Size));
+        free.Size -= fileToMove.Size;
+        if (free.Size == 0)
+        {
+            blocks.Remove(start);
+        }
+
+        var newEmptySpace = blocks.AddBefore(end, new FreeBlock(0, fileToMove.Size));
+
+        start = blocks.First!;
+        end = end.Previous!;
+
+        blocks.Remove(newEmptySpace.Next!);
+
+        //Print();
+    }
+
+    end = end.Previous!;
+}
 
 ulong checksum = 0UL;
-
-do
+int id = 0;
+foreach (var block in blocks)
 {
-    if (forward.Current is FileBlock first)
+    if (block is not FileBlock f)
     {
-        StoreBlock(first.FileId);
-        forward.MoveNext();
+        id += block.Size;
         continue;
     }
 
-    if (backward.Current is not FileBlock last)
+    for (int j = 0; j < block.Size; j++)
     {
-        backward.MoveNext();
-        continue;
+        checksum += (ulong)(id * f.FileId);
+        id++;
     }
+}
 
-    StoreBlock(fileBlockCount - last.FileId);
-    forward.MoveNext();
-    backward.MoveNext();
-} while (forward.Current.BlockId < blockCount - backward.Current.BlockId - 1);
+Console.WriteLine(checksum);
 
-if (debug) Console.Write('.');
-
-while (backward.Current is FileBlock f && f.Bit < diskMap[forward.Current.BlockId] - forward.Current.Bit)
+void Print()
 {
-    StoreBlock(fileBlockCount - f.FileId);
-    backward.MoveNext();
+    foreach (var block in blocks)
+    {
+        Console.Write(new string(block is FileBlock f ? (char)('0' + f.FileId) : '.', block.Size));
+    }
+    Console.WriteLine();
 }
 
 Console.WriteLine();
-Console.WriteLine($"Part 1: {checksum}");
-Console.WriteLine($"Part 2: {""}");
 
-void StoreBlock(int fileId)
+abstract file record Block(int BlockId, int Size)
 {
-    checksum += (ulong)(fileId * position);
-    position++;
-    if (debug) Console.Write((char)(fileId + '0'));
+    public int Size { get; set; } = Size;
 }
-
-file class BlockStream
-{
-    protected readonly IEnumerator<int> _diskMap;
-    protected int _blockId;
-    protected int _fileId;
-    protected int _bit;
-    private bool _currentBlockIsFile = true;
-
-    public BlockStream(IEnumerable<int> diskMap)
-    {
-        _diskMap = diskMap.GetEnumerator();
-        _bit = 0;
-        _diskMap.MoveNext();
-    }
-
-    public Block Current => _currentBlockIsFile
-        ? new FileBlock(_fileId, _blockId, _bit)
-        : new FreeBlock(_blockId, _bit);
-
-    public bool MoveNext()
-    {
-        _bit++;
-
-        // Moving onto a new file block
-        while (_bit == _diskMap.Current)
-        {
-            if (!_diskMap.MoveNext())
-            {
-                return false;
-            }
-
-            _bit = 0;
-            _currentBlockIsFile = !_currentBlockIsFile;
-            if (_currentBlockIsFile)
-            {
-                _fileId++;
-            }
-            _blockId++;
-        }
-
-        return true;
-    }
-}
-
-abstract file record Block(int BlockId, int Bit);
-file record FileBlock(int FileId, int BlockId, int Bit) : Block(BlockId, Bit);
-file record FreeBlock(int BlockId, int Bit) : Block(BlockId, Bit);
+file record FileBlock(int FileId, int BlockId, int Size) : Block(BlockId, Size);
+file record FreeBlock(int BlockId, int Size) : Block(BlockId, Size);
