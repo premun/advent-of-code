@@ -6,7 +6,57 @@ var stones = Resources.GetInputFileLines()
     .SplitToNumbers(" ")
     .Select(v => new Stone((ulong)v, 0));
 
-var queue = new ConcurrentQueue<Stone>();
+Console.WriteLine(string.Join(", ", stones.Select(s => ReturnDifferentStones(s.Number).Count)));
+
+static HashSet<ulong> ReturnDifferentStones(ulong number)
+{
+    HashSet<ulong> differentStones = [ number ];
+    var queue = new ConcurrentQueue<ulong>();
+    queue.Enqueue(number);
+    var previousCount = 0;
+
+    while (!queue.IsEmpty && previousCount != differentStones.Count)
+    {
+        previousCount = differentStones.Count;
+
+        if (!queue.TryDequeue(out ulong n)) continue;
+
+        var (first, second) = Blink(n);
+
+        queue.Enqueue(first);
+        differentStones.Add(first);
+
+        if (second.HasValue)
+        {
+            queue.Enqueue(second.Value);
+            differentStones.Add(second.Value);
+        }
+    }
+
+    return differentStones;
+}
+
+static (ulong, ulong?) Blink(ulong number)
+{
+    if (number == 0)
+    {
+        return (1, null);
+    }
+
+    var digits = (int)(Math.Log10(number) + 1);
+    if (digits % 2 != 0)
+    {
+        return (number * 2024, null);
+    }
+
+    var div = (ulong)Math.Pow(10, digits / 2);
+    var left = number / div;
+    var right = number - left * div;
+
+    return (left, right);
+}
+
+/*var queue = new ConcurrentQueue<Stone>();
 
 var maxGenerations = 75;
 var total = 0UL;
@@ -77,6 +127,6 @@ void Enqueue(Stone stone)
 }
 
 Console.WriteLine($"Part 1: {total}");
-Console.WriteLine($"Part 2: {""}");
+Console.WriteLine($"Part 2: {""}");*/
 
 readonly file record struct Stone(ulong Number, int Generation);
