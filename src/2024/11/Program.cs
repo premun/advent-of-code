@@ -1,18 +1,95 @@
-﻿using AdventOfCode.Common;
+﻿using System.Collections.Concurrent;
+using AdventOfCode.Common;
 
 var stones = Resources.GetInputFileLines()
     .First()
     .SplitToNumbers(" ")
-    .Select(v => new Stone((ulong)v, 0));
+    .Select(v => new Stone((ulong)v, 0))
+    .ToArray();
 
-Console.WriteLine(string.Join(", ", stones.Select(s => ReturnDifferentStones(s).Count)));
+var differentStones = new HashSet<ulong>();
+foreach (var stone in stones)
+{
+    foreach (var s in GetDifferentStones(stone).Keys.Concat(stones.Select(s => s.Number)))
+    {
+        differentStones.Add(s);
+    }
+}
 
-static Dictionary<ulong, int> ReturnDifferentStones(Stone startingStone)
+Console.WriteLine($"Found {differentStones.Count} different stones");
+const int step = 25;
+
+var stoneExpansionMap = new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, ulong>>();
+Parallel.ForEach(differentStones, stone =>
+{
+    stoneExpansionMap[stone] = ExpandStones([new Stone(stone, 0)], step, []);
+});
+
+Console.WriteLine("Stone expansion map finished");
+
+var stonesAfterStep = ExpandStones(stones, step, []);
+
+Console.WriteLine($"Stones after  {step}: {stonesAfterStep.Values.Sum()}");
+
+for (int i = step; i < step * 4;)
+{
+    var stonesAfter = new ConcurrentDictionary<ulong, ulong>();
+    foreach (var stone in stonesAfterStep)
+    {
+        foreach (var newStone in stoneExpansionMap[stone.Key])
+        {
+            var newStoneCount = newStone.Value * stone.Value;
+            stonesAfter.AddOrUpdate(newStone.Key, newStoneCount, (_, previous) => previous + newStoneCount);
+        }
+    }
+
+    i += step;
+    Console.WriteLine($"Stones after {i}: {stonesAfter.Values.Sum()}");
+    stonesAfterStep = stonesAfter;
+}
+
+static ConcurrentDictionary<ulong, ulong> ExpandStones(IEnumerable<Stone> stones, int blinkTimes, ConcurrentDictionary<ulong, ulong> expandedStones)
+{
+    var queue = new ConcurrentQueue<Stone>();
+
+    foreach (var s in stones)
+    {
+        queue.Enqueue(s);
+        while (!queue.IsEmpty)
+        {
+            Parallel.ForEach(queue, _ =>
+            {
+                if (!queue.TryDequeue(out Stone stone)) return;
+
+                if (stone.Generation == blinkTimes)
+                {
+                    expandedStones.AddOrUpdate(stone.Number, 1, (_, value) => value + 1);
+                    return;
+                }
+
+                var newGeneration = stone.Generation + 1;
+                var newStones = Blink(stone.Number);
+
+                queue.Enqueue(new Stone(newStones.Item1, newGeneration));
+
+                if (newStones.Item2.HasValue)
+                {
+                    queue.Enqueue(new Stone(newStones.Item2.Value, newGeneration));
+                }
+            });
+        }
+    }
+
+    return expandedStones;
+}
+
+static Dictionary<ulong, int> GetDifferentStones(Stone startingStone)
 {
     Dictionary<ulong, int> differentStones = new()
     {
         [startingStone.Number] = startingStone.Generation
     };
+
     var queue = new Queue<Stone>();
     queue.Enqueue(startingStone);
 
@@ -21,20 +98,19 @@ static Dictionary<ulong, int> ReturnDifferentStones(Stone startingStone)
         if (!queue.TryDequeue(out Stone n)) continue;
 
         var (first, second) = Blink(n.Number);
+        var ng = n.Generation + 1;
 
-        void TryEnqueue(Stone s)
+        if (differentStones.TryAdd(first, ng))
         {
-            if (differentStones.TryAdd(s.Number, s.Generation))
-            {
-                queue.Enqueue(s);
-            }
+            queue.Enqueue(new Stone(first, ng));
         }
-
-        TryEnqueue(new Stone(first, n.Generation + 1));
 
         if (second.HasValue)
         {
-            TryEnqueue(new Stone(second.Value, n.Generation + 1));
+            if (differentStones.TryAdd(second.Value, ng))
+            {
+                queue.Enqueue(new Stone(second.Value, ng));
+            }
         }
     }
 
