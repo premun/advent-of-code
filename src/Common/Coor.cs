@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Drawing;
+using System.Numerics;
 
 namespace AdventOfCode.Common;
 
@@ -50,6 +51,14 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
         => FourWayNeighbours.Select(c => this + c);
 
     public bool IsOpposite(Coor<T> other) => (this + other) == Zero;
+
+    public static readonly Dictionary<char, Coor<T>> DirectionMap = new()
+    {
+        { '<', Left },
+        { '>', Right },
+        { '^', Up },
+        { 'v', Down },
+    };
 
     public static bool operator ==(Coor<T> me, (T, T) other) => new Coor<T>(other.Item1, other.Item2) == me;
     public static bool operator !=(Coor<T> me, (T, T) other) => !(me == other);
