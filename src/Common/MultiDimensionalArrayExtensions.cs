@@ -88,6 +88,23 @@ public static class MultiDimensionalArrayExtensions
         }
     }
 
+    public static void Print<T>(this T[,] map, Func<Coor<int>, (char, ConsoleColor)> printOverride)
+    {
+        for (var y = 0; y < map.Height(); y++)
+        {
+            for (var x = 0; x < map.Width(); x++)
+            {
+                var tmp = Console.ForegroundColor;
+                var c = printOverride.Invoke(new(y, x));
+                Console.ForegroundColor = c.Item2;
+                Console.Write(c.Item1);
+                Console.ForegroundColor = tmp;
+            }
+
+            Console.WriteLine();
+        }
+    }
+
     // Returns a set of vectors of possible ways to traverse a rectangle:
     // - Rows
     // - Columns

@@ -60,6 +60,17 @@ public record Coor<T>(T Y, T X) where T : INumber<T>
         { 'v', Down },
     };
 
+    public Coor<T> Normalize()
+    {
+        T x = T.Zero;
+        if (X > T.Zero) x = T.One;
+        if (X < T.Zero) x = -T.One;
+        T y = T.Zero;
+        if (Y > T.Zero) y = T.One;
+        if (Y < T.Zero) y = -T.One;
+        return new Coor<T>(y, x);
+    }
+
     public static bool operator ==(Coor<T> me, (T, T) other) => new Coor<T>(other.Item1, other.Item2) == me;
     public static bool operator !=(Coor<T> me, (T, T) other) => !(me == other);
     public static Coor<T> operator +(Coor<T> me, (T, T) other) => new(Y: me.Y + other.Item1, X: me.X + other.Item2);
